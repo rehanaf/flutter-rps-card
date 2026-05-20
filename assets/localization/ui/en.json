@@ -1,0 +1,20 @@
+{
+  "appTitle": "Card Game",
+  "playButton": "Play",
+  "settingsButton": "Settings",
+  "backButton": "Back",
+  "cardNameLabel": "Name",
+  "cardDescriptionLabel": "Description",
+  "dragCardsHint": "Drag cards to the areas above.",
+  "settingsTitle": "Settings",
+  "customNameLabel": "Custom Name",
+  "saveButton": "Save",
+  "cancelButton": "Cancel",
+  "winTitle": "You Win!",
+  "loseTitle": "You Lose",
+  "loseDescription": "Your opponent wins this match. Try again and beat them next time!",
+  "playAgainButton": "Play Again",
+  "mainMenuButton": "Main Menu",
+  "collectionTitle": "Deck Collection",
+  "collectionButton": "Collection"
+}

@@ -1,0 +1,57 @@
+name: my_rps_game
+description: "RPS Card Game 101 Elements."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  provider: ^6.1.5+1
+  flutter_animate: ^4.5.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/data/
+    - assets/localization/cards/
+    - assets/localization/ui/
+    - assets/images/background/
+    - assets/images/cards/
+    - assets/images/player/
+    - assets/images/enemy/
+
+  fonts:
+    - family: Outfit
+      fonts:
+        - asset: assets/fonts/Outfit/Outfit-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Outfit/Outfit-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Outfit/Outfit-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Outfit/Outfit-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Outfit/Outfit-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Outfit/Outfit-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Outfit/Outfit-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Outfit/Outfit-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/Outfit/Outfit-Black.ttf
+          weight: 900
+    
+    - family: Electrolize
+      fonts:
+        - asset: assets/fonts/Electrolize/Electrolize-Regular.ttf
+          weight: 400

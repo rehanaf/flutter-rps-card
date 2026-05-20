@@ -1,0 +1,11 @@
+[
+  {
+    "id": "e_fire_mage",
+    "name": "Fire Mage",
+    "base_hp": 100,
+    "archetype": "Fire",
+    "deck_size": 10,
+    "synergy_count": 7,
+    "random_count": 3
+  }
+]

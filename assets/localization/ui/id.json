@@ -1,0 +1,20 @@
+{
+  "appTitle": "Permainan Kartu",
+  "playButton": "Main",
+  "settingsButton": "Pengaturan",
+  "backButton": "Kembali",
+  "cardNameLabel": "Nama",
+  "cardDescriptionLabel": "Deskripsi",
+  "dragCardsHint": "Seret kartu ke area di atas.",
+  "settingsTitle": "Pengaturan",
+  "customNameLabel": "Nama Kustom",
+  "saveButton": "Simpan",
+  "cancelButton": "Batal",
+  "winTitle": "Menang!",
+  "loseTitle": "Kalah",
+  "loseDescription": "Musuh memenangkan pertandingan. Coba lagi untuk menang!",
+  "playAgainButton": "Main Lagi",
+  "mainMenuButton": "Menu Utama",
+  "collectionTitle": "Koleksi Deck",
+  "collectionButton": "Koleksi"
+}
