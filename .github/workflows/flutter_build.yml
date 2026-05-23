@@ -9,6 +9,8 @@ on:
     branches:
       - main
       - master
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 
 jobs:
   # ==========================================
@@ -61,7 +63,7 @@ jobs:
   # JOB 2: BUILD WINDOWS (Runner: Windows)
   # ==========================================
   build-windows:
-    runs-on: windows-latest
+    runs-on: windows-2025
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -88,7 +90,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-release
-          path: build/windows/runner/Release
+          path: build/windows/x64/runner/Release
 
   # ==========================================
   # JOB 3: BUILD IOS & MACOS (Runner: macOS)

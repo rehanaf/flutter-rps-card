@@ -55,18 +55,29 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
             ..translateByDouble(translateX, translateY + (isHovered ? -(dynamicCardWidth / 2) : 0.0), 0.0, 1.0)
             ..rotateZ(isHovered ? 0 : rotationAngle),
           child: UnconstrainedBox(
-            child: MouseRegion(
-              onEnter: (_) {
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
                 setState(() {
-                  _hoveredCardIndex = index;
+                  if (_hoveredCardIndex == index) {
+                    _hoveredCardIndex = null; // Tutup kartu jika diketuk ulang
+                  } else {
+                    _hoveredCardIndex = index; // Buka kartu ini
+                  }
                 });
               },
-              onExit: (_) {
-                setState(() {
-                  _hoveredCardIndex = null;
-                });
-              },
-              child: AnimatedScale(
+              child: MouseRegion(
+                onEnter: (_) {
+                  setState(() {
+                    _hoveredCardIndex = index;
+                  });
+                },
+                onExit: (_) {
+                  setState(() {
+                    _hoveredCardIndex = null;
+                  });
+                },
+                child: AnimatedScale(
                 scale: isHovered ? 1.15 : 1.0, 
                 duration: const Duration(milliseconds: 150),
                 curve: Curves.easeOutCubic,
@@ -107,6 +118,7 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
                     isPlayerCard: true,
                     width: dynamicCardWidth,
                     tooltipOnRight: tooltipOnRight,
+                    forceShowTooltip: isHovered,
                   ),
                 ),
               ),

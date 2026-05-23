@@ -19,13 +19,36 @@ class AppLocalizations {
   static final Map<String, EnemyMetadata> _enemiesMetadata = {};
 
   Future<bool> load() async {
+    // 1. Load UI Texts (dengan Fallback ke en.json)
+    String uiJsonString;
     try {
-      String uiJsonString = await rootBundle.loadString('assets/localization/ui/${locale.languageCode}.json');
-      _uiTexts = json.decode(uiJsonString) as Map<String, dynamic>;
+      uiJsonString = await rootBundle.loadString('assets/localization/ui/${locale.languageCode}.json');
+    } catch (_) {
+      try {
+        uiJsonString = await rootBundle.loadString('assets/localization/ui/en.json');
+      } catch (e) {
+        debugPrint("Critical: Failed to load fallback UI localizations: $e");
+        return false;
+      }
+    }
+    _uiTexts = json.decode(uiJsonString) as Map<String, dynamic>;
 
-      String cardJsonString = await rootBundle.loadString('assets/localization/cards/${locale.languageCode}.json');
-      _cardTexts = json.decode(cardJsonString) as Map<String, dynamic>;
+    // 2. Load Card Texts (dengan Fallback ke en.json)
+    String cardJsonString;
+    try {
+      cardJsonString = await rootBundle.loadString('assets/localization/cards/${locale.languageCode}.json');
+    } catch (_) {
+      try {
+        cardJsonString = await rootBundle.loadString('assets/localization/cards/en.json');
+      } catch (e) {
+        debugPrint("Critical: Failed to load fallback Card localizations: $e");
+        return false;
+      }
+    }
+    _cardTexts = json.decode(cardJsonString) as Map<String, dynamic>;
 
+    // 3. Load Metadata (cards.json dan enemies.json)
+    try {
       String cardDataString = await rootBundle.loadString('assets/data/cards.json');
       final Map<String, dynamic> cardDataMap = json.decode(cardDataString) as Map<String, dynamic>;
       final List<dynamic> cardsList = cardDataMap['cards'] as List<dynamic>;
@@ -44,12 +67,12 @@ class AppLocalizations {
         final enemyMeta = EnemyMetadata.fromJson(enemyJson as Map<String, dynamic>);
         _enemiesMetadata[enemyMeta.id] = enemyMeta;
       }
-
-      return true;
     } catch (e) {
-      debugPrint("Error loading localizations/JSON data: $e");
+      debugPrint("Error loading JSON metadata: $e");
       return false;
     }
+
+    return true;
   }
 
   String getUiText(String key) => _uiTexts[key] ?? key;

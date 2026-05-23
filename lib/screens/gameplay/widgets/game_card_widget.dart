@@ -11,6 +11,7 @@ class GameCardWidget extends StatefulWidget {
   final bool isPlayerCard;
   final double width;
   final bool? tooltipOnRight; // Mengatur penempatan tooltip di kanan/kiri
+  final bool forceShowTooltip; // Mengaktifkan tampilan tooltip secara paksa (untuk tap di mobile)
 
   // DATA WARNA SINERGI SESUAI KONFIGURASI PROYEK
   static const Map<String, Map<String, String>> synergyColors = {
@@ -34,6 +35,7 @@ class GameCardWidget extends StatefulWidget {
     this.isPlayerCard = true,
     required this.width,
     this.tooltipOnRight,
+    this.forceShowTooltip = false,
   });
 
   @override
@@ -325,7 +327,7 @@ class _GameCardWidgetState extends State<GameCardWidget> {
           ),
 
           // 2. DETAIL TOOLTIP SLAY THE SPIRE (MELAYANG DI SAMPING KIRI/KANAN KARTU)
-          if (_isHovered && cardMeta != null)
+          if ((_isHovered || widget.forceShowTooltip) && cardMeta != null)
             Positioned(
               top: 0,
               left: isRight ? widget.width + 12 : null,
