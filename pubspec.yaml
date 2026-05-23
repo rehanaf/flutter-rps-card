@@ -28,6 +28,7 @@ flutter:
     - assets/images/cards/
     - assets/images/player/
     - assets/images/enemy/
+    - assets/images/characters/
 
   fonts:
     - family: Outfit

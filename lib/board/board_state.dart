@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/playing_card.dart';
 import '../models/enemy_metadata.dart';
@@ -15,6 +17,8 @@ class BoardState extends ChangeNotifier {
 
   PlayingCard? playerCardOnTable;
   PlayingCard? enemyCardOnTable;
+  PlayingCard? nextEnemyCard;
+  bool isEnemyCardRevealed = false;
 
   double cardX = 0;
   double cardY = 0;
@@ -54,6 +58,8 @@ class BoardState extends ChangeNotifier {
 
     playerCardOnTable = null;
     enemyCardOnTable = null;
+    nextEnemyCard = null;
+    isEnemyCardRevealed = false;
     appearingCardIds.clear();
     disappearingCardIds.clear();
     isAnimating = false;
@@ -61,9 +67,111 @@ class BoardState extends ChangeNotifier {
     isBattleCalculated = false;
     battleLog = "Lawan baru muncul: ${enemy.name}! Bersiaplah!";
 
+    // Terapkan efek start turn di awal pertempuran
+    applyStartTurnEffects(player);
+    applyStartTurnEffects(enemy);
+
     // Picu draw bergiliran di awal pertandingan
     triggerDrawSequence(initialDrawCount);
+    prepareEnemyNextCard();
     notifyListeners();
+  }
+
+  /// 1b. PERSIAPKAN AKSI BERIKUTNYA UNTUK MUSUH (INTENT SYSTEM)
+  void prepareEnemyNextCard() {
+    isEnemyCardRevealed = false;
+    if (enemy.hand.isEmpty) {
+      // Kocok ulang kuburan musuh jika dek utama kosong
+      if (enemy.deck.isEmpty && enemy.discardPile.isNotEmpty) {
+        enemy.deck.addAll(enemy.discardPile);
+        enemy.discardPile.clear();
+        enemy.deck.shuffle();
+      }
+      if (enemy.deck.isNotEmpty) {
+        enemy.drawCards(1);
+      }
+    }
+    if (enemy.hand.isNotEmpty) {
+      nextEnemyCard = enemy.hand.removeLast();
+    } else {
+      nextEnemyCard = null;
+    }
+    notifyListeners();
+  }
+
+  /// Membelanjakan Emas untuk meneropong kartu musuh
+  bool revealEnemyCard(PlayerRun playerRun) {
+    if (isEnemyCardRevealed) return true;
+    if (playerRun.spendGold(5)) {
+      isEnemyCardRevealed = true;
+      notifyListeners();
+      return true;
+    }
+    return false;
+  }
+
+  /// Getters untuk petunjuk niat musuh
+  String? get enemyIntentText {
+    if (nextEnemyCard == null) return null;
+    final cardId = nextEnemyCard!.id;
+    final meta = _cardDataRepository[cardId];
+    if (meta == null) return "Bersiap...";
+    
+    final int val = int.tryParse(cardId) ?? 0;
+    String sector = "";
+    if (val <= 33) {
+      sector = "Low (1-33)";
+    } else if (val <= 67) {
+      sector = "Mid (34-67)";
+    } else {
+      sector = "High (68-101)";
+    }
+
+    return "${meta.synergy} [Sector $sector]";
+  }
+
+  IconData get enemyIntentIcon {
+    if (nextEnemyCard == null) return Icons.help_outline_rounded;
+    final cardId = nextEnemyCard!.id;
+    final meta = _cardDataRepository[cardId];
+    if (meta == null) return Icons.help_outline_rounded;
+
+    switch (meta.synergy.toLowerCase()) {
+      case 'fire': return Icons.local_fire_department_rounded;
+      case 'liquid': return Icons.water_drop_rounded;
+      case 'nature': return Icons.forest_rounded;
+      case 'air': return Icons.wb_cloudy_rounded;
+      case 'robot': return Icons.precision_manufacturing_rounded;
+      case 'cosmic': return Icons.auto_awesome_rounded;
+      case 'energy': return Icons.bolt_rounded;
+      case 'spirit': return Icons.psychology_rounded;
+      case 'dark': return Icons.shield_moon_rounded;
+      case 'ancient': return Icons.gavel_rounded;
+      case 'toxic': return Icons.science_rounded;
+      default: return Icons.layers_rounded;
+    }
+  }
+
+  Color get enemyIntentColor {
+    if (nextEnemyCard == null) return const Color(0xFFC5A059);
+    final cardId = nextEnemyCard!.id;
+    final meta = _cardDataRepository[cardId];
+    if (meta == null) return const Color(0xFFC5A059);
+
+    switch (meta.synergy.toLowerCase()) {
+      case 'fire': return const Color(0xFFFF4500);
+      case 'liquid': return const Color(0xFF1E90FF);
+      case 'nature': return const Color(0xFF8B4513);
+      case 'air': return const Color(0xFF87CEEB);
+      case 'robot': return const Color(0xFF9DA5A8);
+      case 'cosmic': return const Color(0xFF9370DB);
+      case 'energy': return const Color(0xFFFFD700);
+      case 'spirit': return const Color(0xFF00CED1);
+      case 'dark': return const Color(0xFF4B0082);
+      case 'ancient': return const Color(0xFFFFD700);
+      case 'toxic': return const Color(0xFFADFF2F);
+      default: return const Color(0xFFC5A059);
+    }
   }
 
   void _generateEnemyArchetypeDeck(EnemyMetadata meta, Map<String, CardMetadata> allCards) {
@@ -120,10 +228,6 @@ class BoardState extends ChangeNotifier {
   // LOGIKA AMBIL & BUANG KARTU BERGILIRAN (SEQUENTIAL EFFECT)
   // ====================================================================
 
-  // ====================================================================
-  // LOGIKA AMBIL & BUANG KARTU BERGILIRAN (SEQUENTIAL EFFECT)
-  // ====================================================================
-
   /// Menarik kartu dari deck ke tangan secara bergiliran
   void triggerDrawSequence(int count) async {
     for (int i = 0; i < count; i++) {
@@ -171,6 +275,7 @@ class BoardState extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   /// Membuang seluruh sisa kartu di tangan ke Discard Pile secara bergiliran
   Future<void> triggerDiscardSequence() async {
     // Ambil duplikasi kartu tangan saat ini untuk dianimasikan keluar satu per satu
@@ -196,10 +301,13 @@ class BoardState extends ChangeNotifier {
   }
 
   void _executeEnemyAIAction() {
-    if (enemy.deck.isEmpty && enemy.discardPile.isEmpty) return;
-    if (enemy.hand.isEmpty) enemy.drawCards(1);
+    if (nextEnemyCard == null) {
+      prepareEnemyNextCard();
+    }
+    if (nextEnemyCard == null) return;
 
-    enemyCardOnTable = enemy.hand.removeLast();
+    enemyCardOnTable = nextEnemyCard;
+    nextEnemyCard = null;
     battleLog = "Musuh mengeluarkan kartu tandingan! Mengalkulasi hasil...";
     isBattleCalculated = true;
     notifyListeners();
@@ -209,47 +317,111 @@ class BoardState extends ChangeNotifier {
     });
   }
 
+  // ====================================================================
+  // SIKLUS HIDUP STATUS EFFECT (TURN-BASED TRIGGERS)
+  // ====================================================================
+
+  void applyStartTurnEffects(Player activePlayer) {
+    // Cek 'shield': Jika ada, tambahkan block gratis sebesar nilai value.
+    if (activePlayer.hasEffect(EffectType.shield)) {
+      final shieldEffect = activePlayer.getEffect(EffectType.shield);
+      activePlayer.shield += shieldEffect.value;
+      activePlayer.removeEffect(EffectType.shield);
+      battleLog += "\n🛡️ [Start Turn] ${activePlayer.name} mengubah Status Shield menjadi +${shieldEffect.value} Block riil.";
+    }
+
+    // Cek 'dot': Jika ada, kurangi HP langsung sebesar nilai value, lalu kurangi value sebesar 1. Jika value <= 0, hapus efek 'dot'.
+    if (activePlayer.hasEffect(EffectType.dot)) {
+      final dotEffect = activePlayer.getEffect(EffectType.dot);
+      activePlayer.takeDamage(dotEffect.value);
+      battleLog += "\n💧 [Start Turn] ${activePlayer.name} terkena DoT! Kehilangan ${dotEffect.value} HP.";
+      dotEffect.value -= 1;
+      if (dotEffect.value <= 0) {
+        activePlayer.removeEffect(EffectType.dot);
+        battleLog += " (Efek DoT telah habis)";
+      }
+    }
+  }
+
+  void applyEndTurnEffects(Player activePlayer) {
+    // Kurangi value dari efek berdurasi seperti 'damageReduce' dan 'vulnerable' sebesar 1. Jika value <= 0, hapus efek tersebut dari list.
+    if (activePlayer.hasEffect(EffectType.damageReduce)) {
+      final weakenEffect = activePlayer.getEffect(EffectType.damageReduce);
+      weakenEffect.value -= 1;
+      if (weakenEffect.value <= 0) {
+        activePlayer.removeEffect(EffectType.damageReduce);
+        battleLog += "\n⏳ Efek Weaken pada ${activePlayer.name} telah berakhir.";
+      }
+    }
+
+    if (activePlayer.hasEffect(EffectType.vulnerable)) {
+      final vulnEffect = activePlayer.getEffect(EffectType.vulnerable);
+      vulnEffect.value -= 1;
+      if (vulnEffect.value <= 0) {
+        activePlayer.removeEffect(EffectType.vulnerable);
+        battleLog += "\n⏳ Efek Vulnerable pada ${activePlayer.name} telah berakhir.";
+      }
+    }
+  }
+
+  // ====================================================================
+  // LOGIKA BATTLE RESOLUTION DENGAN VALUE SEBAGAI METRIC
+  // ====================================================================
+
   /// 6. RESOLUSI PERTEMPURAN
   void _calculateBattleResolution() async {
     if (playerCardOnTable == null || enemyCardOnTable == null) return;
 
     final result = playerCardOnTable!.beats(enemyCardOnTable!);
-    int pDamage = _cardDataRepository[playerCardOnTable!.id]?.power ?? 20;
-    int eDamage = _cardDataRepository[enemyCardOnTable!.id]?.power ?? 20;
 
-    if (result == BattleResult.win) {
-      if (player.hasDamageDebuff) {
-        final debuff = player.activeEffects.firstWhere((e) => e.type == EffectType.damageReduce);
-        pDamage = (pDamage * (1 - debuff.value)).round();
-      }
-      enemy.takeDamage(pDamage);
-      battleLog = "Kamu MENANG! Kartu ID ${playerCardOnTable!.id} memberikan $pDamage damage.";
-    } else if (result == BattleResult.lose) {
-      if (enemy.hasDamageDebuff) {
-        final debuff = enemy.activeEffects.firstWhere((e) => e.type == EffectType.damageReduce);
-        eDamage = (eDamage * (1 - debuff.value)).round();
-      }
-      player.takeDamage(eDamage);
-      battleLog = "Kamu KALAH! Menelan hantaman sebesar $eDamage damage.";
-    } else {
-      battleLog = "Hasil SERI! Kedua kartu hancur di meja arena.";
+    // --- LANGKAH A: Hitung base damage kartu + bonus flat dari 'strength' ---
+    int pDamage = _cardDataRepository[playerCardOnTable!.id]?.power ?? 20;
+    if (player.hasEffect(EffectType.strength)) {
+      pDamage += player.getEffect(EffectType.strength).value;
     }
 
-    // Kartu meja langsung masuk pembuangan
+    int eDamage = _cardDataRepository[enemyCardOnTable!.id]?.power ?? 20;
+    if (enemy.hasEffect(EffectType.strength)) {
+      eDamage += enemy.getEffect(EffectType.strength).value;
+    }
+
+    // --- LANGKAH B: Jika penyerang memiliki status 'damageReduce', potong total damage sebesar 25% ---
+    if (player.hasEffect(EffectType.damageReduce)) {
+      pDamage = (pDamage * 0.75).round();
+    }
+    if (enemy.hasEffect(EffectType.damageReduce)) {
+      eDamage = (eDamage * 0.75).round();
+    }
+
+    // Jalankan pertempuran utama berdasarkan hasil RPS
+    if (result == BattleResult.win) {
+      battleLog = "Kamu MENANG! Kartu ID ${playerCardOnTable!.id} menyerang musuh.";
+      _applyCombatDamage(player, enemy, pDamage);
+    } else if (result == BattleResult.lose) {
+      battleLog = "Kamu KALAH! Kartu musuh menerobos pertahananmu.";
+      _applyCombatDamage(enemy, player, eDamage);
+    } else {
+      battleLog = "Hasil SERI! Kedua kartu hancur di meja arena tanpa damage clash.";
+    }
+
+    // --- SUNTIKKAN CONDITIONAL ABILITY BERDASARKAN BATTLE RESULT ---
+    _applyCardAbilities(playerCardOnTable!, enemyCardOnTable!, result);
+
+    // Kartu meja masuk pembuangan
     player.discardPile.add(playerCardOnTable!);
     enemy.discardPile.add(enemyCardOnTable!);
 
-    player.updateEffectsTick();
-    enemy.updateEffectsTick();
+    // --- AKHIR GILIRAN: Jalankan End Turn Effects ---
+    applyEndTurnEffects(player);
+    applyEndTurnEffects(enemy);
 
     if (player.isDead || enemy.isDead) {
       _endMatchProgress();
     } else {
       // ==========================================
-      // MANAJEMEN HAND BERGILIRAN (FIXED NO BUG 6 CARD)
+      // MANAJEMEN HAND BERGILIRAN
       // ==========================================
       if (discardAllAfterTurn) {
-        // Panggil fungsi sekuens pembuangan bergiliran yang baru dan TUNGGU (await) sampai bersih total
         await triggerDiscardSequence();
       }
 
@@ -258,8 +430,169 @@ class BoardState extends ChangeNotifier {
       enemyCardOnTable = null;
       notifyListeners();
 
-      // Isi kembali kartu untuk turn berikutnya secara bergiliran
+      // --- AWAL GILIRAN BARU: Jalankan Start Turn Effects ---
+      applyStartTurnEffects(player);
+      applyStartTurnEffects(enemy);
+
+      // Isi kembali kartu untuk turn berikutnya
       triggerDrawSequence(turnDrawCount);
+      prepareEnemyNextCard();
+    }
+  }
+
+  void _applyCombatDamage(Player attacker, Player defender, int rawDamage) {
+    int dmg = rawDamage;
+
+    // --- LANGKAH C: Periksa 'immunity' pada target ---
+    if (defender.hasEffect(EffectType.immunity)) {
+      dmg = 0;
+      final immEffect = defender.getEffect(EffectType.immunity);
+      immEffect.value -= 1;
+      if (immEffect.value <= 0) {
+        defender.removeEffect(EffectType.immunity);
+      }
+      battleLog += "\n🛡️ ${defender.name} memiliki IMMUNITY! Kerusakan ditolak sepenuhnya (0 damage).";
+      
+      // Lompat langsung ke fase pemicuan counter
+      _handleCounterStrike(attacker, defender, false);
+      return;
+    }
+
+    // --- LANGKAH D: Periksa status 'vulnerable' pada target ---
+    if (defender.hasEffect(EffectType.vulnerable)) {
+      dmg = (dmg * 1.5).round();
+      battleLog += "\n⚡ ${defender.name} terkena efek VULNERABLE! Menerima damage 50% lebih besar.";
+    }
+
+    // --- LANGKAH E: Aplikasikan final damage ke HP/Shield target ---
+    int finalDamageToHp = dmg;
+    int absorbed = 0;
+    if (defender.shield > 0) {
+      if (defender.shield >= finalDamageToHp) {
+        defender.shield -= finalDamageToHp;
+        absorbed = finalDamageToHp;
+        finalDamageToHp = 0;
+      } else {
+        absorbed = defender.shield;
+        finalDamageToHp -= defender.shield;
+        defender.shield = 0;
+      }
+    }
+    defender.takeDamage(finalDamageToHp);
+
+    if (absorbed > 0) {
+      battleLog += "\n🛡️ Block ${defender.name} menyerap $absorbed damage.";
+    }
+    if (finalDamageToHp > 0) {
+      battleLog += "\n💥 ${defender.name} terkena $finalDamageToHp damage langsung.";
+    } else if (dmg > 0 && finalDamageToHp == 0) {
+      battleLog += "\n🛡️ Block menyerap seluruh serangan!";
+    }
+
+    // --- LANGKAH F (Counter Strike): Berikan damage balasan jika terpicu ---
+    _handleCounterStrike(attacker, defender, dmg > 0);
+  }
+
+  void _handleCounterStrike(Player attacker, Player defender, bool damageEntered) {
+    if (damageEntered && defender.hasEffect(EffectType.counter)) {
+      final counterValue = defender.getEffect(EffectType.counter).value;
+      int counterDmg = counterValue;
+
+      int absorbed = 0;
+      if (attacker.shield > 0) {
+        if (attacker.shield >= counterDmg) {
+          attacker.shield -= counterDmg;
+          absorbed = counterDmg;
+          counterDmg = 0;
+        } else {
+          absorbed = attacker.shield;
+          counterDmg -= attacker.shield;
+          attacker.shield = 0;
+        }
+      }
+      attacker.takeDamage(counterDmg);
+
+      battleLog += "\n⚡ ${defender.name} melakukan COUNTER STRIKE! Membalas $counterValue damage ke ${attacker.name}.";
+      if (absorbed > 0) {
+        battleLog += " (Block menyerap $absorbed)";
+      }
+      if (counterDmg > 0) {
+        battleLog += " (${attacker.name} menerima $counterDmg damage langsung)";
+      }
+    }
+  }
+
+  // ====================================================================
+  // PEMICUAN ABILITY KARTU BERDASARKAN BATTLE RESULT & PELUANG
+  // ====================================================================
+
+  void _applyCardAbilities(PlayingCard playerCard, PlayingCard enemyCard, BattleResult result) {
+    final pMeta = _cardDataRepository[playerCard.id];
+    final eMeta = _cardDataRepository[enemyCard.id];
+
+    if (pMeta != null) {
+      _executeAbility(pMeta.abilityId, player, enemy, result);
+    }
+    if (eMeta != null) {
+      // Untuk musuh, hasilnya berlawanan
+      BattleResult enemyResult = BattleResult.draw;
+      if (result == BattleResult.win) enemyResult = BattleResult.lose;
+      if (result == BattleResult.lose) enemyResult = BattleResult.win;
+      _executeAbility(eMeta.abilityId, enemy, player, enemyResult);
+    }
+  }
+
+  void _executeAbility(String abilityId, Player caster, Player target, BattleResult result) {
+    switch (abilityId) {
+      case "COUNTER_SHIELD":
+        if (result == BattleResult.lose) {
+          caster.addEffect(StatusEffect(type: EffectType.shield, value: 15));
+          battleLog += "\n✨ [Ability] COUNTER_SHIELD: ${caster.name} kalah dan mendapatkan Status Shield (+15).";
+        } else if (result == BattleResult.win) {
+          caster.addEffect(StatusEffect(type: EffectType.strength, value: 4));
+          battleLog += "\n✨ [Ability] COUNTER_SHIELD: ${caster.name} menang dan mendapatkan Strength (+4).";
+        }
+        break;
+      case "EXPLODE":
+        caster.addEffect(StatusEffect(type: EffectType.strength, value: 5));
+        battleLog += "\n🔥 [Ability] EXPLODE: ${caster.name} memperoleh Strength (+5).";
+        break;
+      case "BLOCK":
+      case "DEFEND":
+      case "BARRIER":
+        caster.addEffect(StatusEffect(type: EffectType.shield, value: 12));
+        battleLog += "\n🛡️ [Ability] $abilityId: ${caster.name} bersiap bertahan dengan Status Shield (+12).";
+        break;
+      case "BURN":
+      case "POISON":
+        target.addEffect(StatusEffect(type: EffectType.dot, value: 6));
+        battleLog += "\n🧪 [Ability] $abilityId: ${target.name} terinfeksi DoT (+6).";
+        break;
+      case "TRAP":
+      case "BIND":
+        target.addEffect(StatusEffect(type: EffectType.damageReduce, value: 2));
+        battleLog += "\n🕸️ [Ability] $abilityId: Menurunkan damage output ${target.name} selama 2 turn.";
+        break;
+      case "GLOW":
+      case "ORBIT":
+        // Untuk sinergi Cosmic berbasis peluang 1/4 (25%) untuk memicu immunity
+        if (Random().nextInt(4) == 0) {
+          caster.addEffect(StatusEffect(type: EffectType.immunity, value: 1));
+          battleLog += "\n🌌 [Ability] $abilityId: ${caster.name} memicu IMMUNITY (Kebal) selama 1 turn!";
+        } else {
+          battleLog += "\n🌌 [Ability] $abilityId: Gagal memicu Immunity (Peluang 25%).";
+        }
+        break;
+      case "BLEED":
+      case "STRIKE":
+        target.addEffect(StatusEffect(type: EffectType.vulnerable, value: 2));
+        battleLog += "\n🩸 [Ability] $abilityId: ${target.name} terkena status Vulnerable selama 2 turn.";
+        break;
+      case "CALCULATE":
+      case "COMPUTE":
+        caster.addEffect(StatusEffect(type: EffectType.counter, value: 8));
+        battleLog += "\n⚡ [Ability] $abilityId: ${caster.name} bersiap membalas musuh dengan Status Counter (+8).";
+        break;
     }
   }
 

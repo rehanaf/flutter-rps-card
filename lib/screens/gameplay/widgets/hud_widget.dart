@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import '../../../models/status_effect.dart';
 
 class HudWidget extends StatelessWidget {
   final String name;
   final int hp;
   final int maxHp;
   final bool isEnemy;
+  final int shield;
+  final List<StatusEffect> activeEffects;
 
   const HudWidget({
     super.key,
@@ -12,6 +15,8 @@ class HudWidget extends StatelessWidget {
     required this.hp,
     required this.maxHp,
     required this.isEnemy,
+    this.shield = 0,
+    this.activeEffects = const [],
   });
 
   @override
@@ -24,6 +29,56 @@ class HudWidget extends StatelessWidget {
     // RESPONSIVE RATIO: Lebar bar HP disesuaikan proporsional terhadap layar landscape
     final double barWidth = screenSize.width * 0.16; // Sekitar 140 - 160px mendatar
     final double barHeight = barWidth * 0.10;        // Tinggi bar proporsional
+
+    // Komponen Susunan Efek Status Aktif di Bawah HP Bar
+    Widget buildStatusEffectsList() {
+      if (activeEffects.isEmpty) return const SizedBox.shrink();
+
+      return Padding(
+        padding: const EdgeInsets.only(top: 6.0),
+        child: Wrap(
+          spacing: 5,
+          runSpacing: 3,
+          alignment: isEnemy ? WrapAlignment.end : WrapAlignment.start,
+          children: activeEffects.map((effect) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
+              decoration: BoxDecoration(
+                color: effect.badgeColor.withAlpha(204),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                  color: effect.isBuff ? Colors.white30 : Colors.redAccent.withAlpha(80),
+                  width: 1.0,
+                ),
+                boxShadow: const [
+                  BoxShadow(color: Colors.black26, blurRadius: 2, offset: Offset(0, 1)),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    effect.icon,
+                    color: Colors.white,
+                    size: barHeight * 0.6,
+                  ),
+                  const SizedBox(width: 2),
+                  Text(
+                    "${effect.value}",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'Electrolize',
+                      fontWeight: FontWeight.bold,
+                      fontSize: barHeight * 0.55,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      );
+    }
 
     // Komponen Susunan Bar HP + Teks yang Menimpa tepat di tengah
     Widget buildHpBarWithText() {
@@ -77,11 +132,11 @@ class HudWidget extends StatelessWidget {
             color: isEnemy ? Colors.redAccent : const Color(0xFFC5A059),
             width: avatarSize * 0.04, // Tebal border proporsional
           ),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
-              color: const Color(0x66000000),
+              color: Color(0x66000000),
               blurRadius: 6,
-              offset: const Offset(0, 3),
+              offset: Offset(0, 3),
             )
           ],
         ),
@@ -118,17 +173,58 @@ class HudWidget extends StatelessWidget {
             crossAxisAlignment: isEnemy ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                name,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                  fontSize: barHeight * 1.0, // Skala nama mengikuti rasio tinggi bar darah
-                  letterSpacing: 0.5,
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                textDirection: isEnemy ? TextDirection.rtl : TextDirection.ltr,
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                      fontSize: barHeight * 1.0, // Skala nama mengikuti rasio tinggi bar darah
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  if (shield > 0) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[900]!.withAlpha(217),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: Colors.blue[300]!, width: 1.2),
+                        boxShadow: const [
+                          BoxShadow(color: Colors.black26, blurRadius: 3, offset: Offset(0, 1.5)),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.shield,
+                            color: Colors.blue[100]!,
+                            size: barHeight * 0.8,
+                          ),
+                          const SizedBox(width: 1),
+                          Text(
+                            "$shield",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Electrolize',
+                              fontWeight: FontWeight.bold,
+                              fontSize: barHeight * 0.75,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ]
+                ],
               ),
               SizedBox(height: barHeight * 0.2),
               buildHpBarWithText(),
+              buildStatusEffectsList(),
             ],
           ),
         ],

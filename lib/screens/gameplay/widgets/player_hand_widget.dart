@@ -18,7 +18,6 @@ class PlayerHandWidget extends StatefulWidget {
 }
 
 class _PlayerHandWidgetState extends State<PlayerHandWidget> {
-  // FIXED UNIQUE STATE: Menggunakan index (int) bukan card.id agar kartu duplikat tidak ikut ter-hover
   int? _hoveredCardIndex;
   bool _isDragging = false;
 
@@ -31,7 +30,7 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
 
     final double dynamicCardWidth = widget.screenSize.width * 0.13;
 
-    // 1. Generate seluruh list widget kartu terlebih dahulu ke dalam sebuah List variabel
+    // Generate seluruh list widget kartu tangan
     List<Widget> fannedCards = List.generate(cardCount, (index) {
       final card = handCards[index];
       
@@ -42,11 +41,10 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
       final double translateX = offsetFromCenter * (widget.screenSize.width * 0.11);
       final double translateY = ((offsetFromCenter * offsetFromCenter) * 5.0) + (dynamicCardWidth / 2);
 
-      // FIXED UNIQUE CHECK: Kunci perbandingan berbasis index posisi tangan murni
-      final bool isHovered = index == _hoveredCardIndex && !_isDragging; // Hanya hover jika index cocok dan tidak sedang drag aktif
+      final bool isHovered = index == _hoveredCardIndex && !_isDragging;
+      final bool tooltipOnRight = translateX < 0; // Kiri -> Tampil Kanan, Kanan -> Tampil Kiri
 
       return Positioned(
-        // Gunakan ValueKey gabungan ID dan Index agar elemen re-render secara independen dan akurat
         key: ValueKey('${card.id}_$index'), 
         width: dynamicCardWidth + 20, 
         height: (dynamicCardWidth * 1.4) + 20,
@@ -60,12 +58,12 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
             child: MouseRegion(
               onEnter: (_) {
                 setState(() {
-                  _hoveredCardIndex = index; // Menyimpan index unik kartu saat ini
+                  _hoveredCardIndex = index;
                 });
               },
               onExit: (_) {
                 setState(() {
-                  _hoveredCardIndex = null; // Reset state
+                  _hoveredCardIndex = null;
                 });
               },
               child: AnimatedScale(
@@ -81,7 +79,7 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
                       _isDragging = true;
                     });
                   },
-                  onDragCompleted: () {
+                  onDragEnd: (details) {
                     setState(() {
                       _isDragging = false;
                     });
@@ -92,6 +90,7 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
                       card: card,
                       isPlayerCard: true,
                       width: dynamicCardWidth * 1.15,
+                      tooltipOnRight: tooltipOnRight,
                     ),
                   ),
                   childWhenDragging: Opacity(
@@ -100,12 +99,14 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
                       card: card,
                       isPlayerCard: true,
                       width: dynamicCardWidth,
+                      tooltipOnRight: false, // Sembunyikan/jangan tampilkan saat drag aktif
                     ),
                   ),
                   child: GameCardWidget(
                     card: card,
                     isPlayerCard: true,
                     width: dynamicCardWidth,
+                    tooltipOnRight: tooltipOnRight,
                   ),
                 ),
               ),
@@ -115,11 +116,7 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
       );
     });
 
-    // ========================================================
-    // FIXED DYNAMIC Z-INDEX CODES
-    // ========================================================
-    // Jika ada kartu yang sedang di-hover, cabut widget tersebut dari posisi index lamanya
-    // lalu dorong (add) ke tumpukan paling akhir agar posisinya berada di layer paling depan layar.
+    // Jika ada kartu yang sedang di-hover, naikkan ke tumpukan paling depan
     if (_hoveredCardIndex != null && _hoveredCardIndex! < fannedCards.length) {
       final Widget hoveredWidget = fannedCards.removeAt(_hoveredCardIndex!);
       fannedCards.add(hoveredWidget);
@@ -129,7 +126,7 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
       child: Stack(
         alignment: Alignment.bottomCenter,
         clipBehavior: Clip.none,
-        children: fannedCards, // Merender susunan kartu dengan Z-Index yang telah dimanipulasi secara dinamis
+        children: fannedCards,
       ),
     );
   }

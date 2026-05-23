@@ -8,6 +8,7 @@ class Player extends ChangeNotifier {
 
   int _hp = 100;
   int _maxHp = 100;
+  int _shield = 0;
 
   List<PlayingCard> hand = [];
   List<PlayingCard> deck = [];
@@ -30,6 +31,12 @@ class Player extends ChangeNotifier {
   set maxHp(int value) {
     _maxHp = value;
     if (_hp > _maxHp) _hp = _maxHp;
+    notifyListeners();
+  }
+
+  int get shield => _shield;
+  set shield(int value) {
+    _shield = value.clamp(0, 9999);
     notifyListeners();
   }
 
@@ -73,24 +80,32 @@ class Player extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addEffect(StatusEffect effect) {
-    final existingIndex = activeEffects.indexWhere((e) => e.type == effect.type);
+  // --- HELPER FUNGSI STATUS EFFECT ---
+
+  bool hasEffect(EffectType type) {
+    return activeEffects.any((e) => e.type == type);
+  }
+
+  StatusEffect getEffect(EffectType type) {
+    return activeEffects.firstWhere((e) => e.type == type);
+  }
+
+  void addEffect(StatusEffect newEffect) {
+    final existingIndex = activeEffects.indexWhere((e) => e.type == newEffect.type);
     
     if (existingIndex != -1) {
-      activeEffects[existingIndex].duration += effect.duration;
+      activeEffects[existingIndex].value += newEffect.value;
     } else {
-      activeEffects.add(effect);
+      activeEffects.add(newEffect);
     }
     notifyListeners();
   }
 
-  void updateEffectsTick() {
-    for (var effect in activeEffects) {
-      effect.decreaseDuration();
-    }
-    activeEffects.removeWhere((effect) => effect.isExpired);
+  void removeEffect(EffectType type) {
+    activeEffects.removeWhere((e) => e.type == type);
     notifyListeners();
   }
 
-  bool get hasDamageDebuff => activeEffects.any((e) => e.type == EffectType.damageReduce);
+  // Compatibility getter untuk hasDamageDebuff
+  bool get hasDamageDebuff => hasEffect(EffectType.damageReduce);
 }

@@ -6,6 +6,7 @@ import 'screens/collection/collection_screen.dart';
 import 'screens/gameplay/gameplay_screen.dart';
 import 'screens/main_menu/main_menu_screen.dart';
 import 'screens/map/map_screen.dart';
+import 'screens/shop/shop_screen.dart';
 import 'services/app_localizations.dart';
 
 void main() {
@@ -65,6 +66,8 @@ class MyApp extends StatelessWidget {
               return MaterialPageRoute(builder: (_) => const GameplayScreen());
             case CollectionScreen.routeName:
               return MaterialPageRoute(builder: (_) => const CollectionScreen());
+            case ShopScreen.routeName:
+              return MaterialPageRoute(builder: (_) => const ShopScreen());
             default:
               return MaterialPageRoute(
                 builder: (_) => Scaffold(

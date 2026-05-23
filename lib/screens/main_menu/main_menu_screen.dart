@@ -81,11 +81,9 @@ class MainMenuScreen extends StatelessWidget {
                     label: localization.getUiText('playButton'),
                     icon: Icons.play_arrow_rounded,
                     onPressed: () {
-                      // Ambil state PlayerRun untuk memulai petualangan (New Run)
-                      final playerRun = Provider.of<PlayerRun>(context, listen: false);
-                      
-                      // Berikan ID kartu starter pack awal untuk master deck (misal kartu ID 1, 2, 3)
-                      playerRun.startNewRun(['10', '18', '61', '10', '18', '61', '10', '18', '61', '10']);
+                      final playerRun = context.read<PlayerRun>();
+                      // Memulai petualangan baru dengan starter deck default terpusat
+                      playerRun.startNewRun();
 
                       // Nanti di sini tinggal pindah rute ke Map Screen:
                       Navigator.pushNamed(context, MapScreen.routeName);
