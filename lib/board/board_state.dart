@@ -34,6 +34,7 @@ class BoardState extends ChangeNotifier {
   bool isBattleCalculated = false;
   String battleLog = "Tarik kartu untuk memulai pertandingan!";
   Map<String, CardMetadata> _cardDataRepository = {};
+  Map<String, int> playerSynergies = {};
 
   /// 1. INISIALISASI PERTEMPURAN
   void initializeBattle({
@@ -62,6 +63,14 @@ class BoardState extends ChangeNotifier {
     isEnemyCardRevealed = false;
     appearingCardIds.clear();
     disappearingCardIds.clear();
+    playerSynergies.clear();
+    for (var card in playerRun.masterDeck) {
+      final meta = allCards[card.id];
+      if (meta != null) {
+        final syn = meta.synergy.toLowerCase();
+        playerSynergies[syn] = (playerSynergies[syn] ?? 0) + 1;
+      }
+    }
     isAnimating = false;
     isPlayerTurn = true;
     isBattleCalculated = false;
@@ -204,6 +213,10 @@ class BoardState extends ChangeNotifier {
     isAnimating = true;
     final double cardWidth = screenSize.width * 0.13;
     player.hand.remove(card);
+    
+    // Apply Auto-Battler Synergy instantly
+    _applySynergyBonus(card);
+    
     notifyListeners();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -216,6 +229,146 @@ class BoardState extends ChangeNotifier {
         notifyListeners();
       });
     });
+  }
+
+  void _applySynergyBonus(PlayingCard card) {
+    final meta = _cardDataRepository[card.id];
+    if (meta == null) return;
+    
+    final synergy = meta.synergy.toLowerCase();
+    final count = playerSynergies[synergy] ?? 0;
+    String logMsg = "";
+
+    switch (synergy) {
+      case 'basic':
+        if (count >= 12) {
+          player.addEffect(StatusEffect(type: EffectType.counter, value: 8));
+          player.addEffect(StatusEffect(type: EffectType.strength, value: 3));
+          logMsg = "+8 Counter, +3 Strength";
+        } else if (count >= 8) {
+          player.addEffect(StatusEffect(type: EffectType.counter, value: 4));
+          player.addEffect(StatusEffect(type: EffectType.strength, value: 1));
+          logMsg = "+4 Counter, +1 Strength";
+        } else if (count >= 4) {
+          player.addEffect(StatusEffect(type: EffectType.counter, value: 2));
+          logMsg = "+2 Counter";
+        }
+        break;
+      case 'nature':
+        if (count >= 9) {
+          player.addEffect(StatusEffect(type: EffectType.heal, value: 10));
+          logMsg = "+10 Heal";
+        } else if (count >= 6) {
+          player.addEffect(StatusEffect(type: EffectType.heal, value: 5));
+          logMsg = "+5 Heal";
+        } else if (count >= 3) {
+          player.addEffect(StatusEffect(type: EffectType.heal, value: 2));
+          logMsg = "+2 Heal";
+        }
+        break;
+      case 'robot':
+        if (count >= 9) { player.addEffect(StatusEffect(type: EffectType.shield, value: 15)); logMsg = "+15 Shield"; }
+        else if (count >= 6) { player.addEffect(StatusEffect(type: EffectType.shield, value: 7)); logMsg = "+7 Shield"; }
+        else if (count >= 3) { player.addEffect(StatusEffect(type: EffectType.shield, value: 3)); logMsg = "+3 Shield"; }
+        break;
+      case 'ancient':
+        if (count >= 6) { player.addEffect(StatusEffect(type: EffectType.shield, value: 15)); logMsg = "+15 Shield"; }
+        else if (count >= 4) { player.addEffect(StatusEffect(type: EffectType.shield, value: 8)); logMsg = "+8 Shield"; }
+        else if (count >= 2) { player.addEffect(StatusEffect(type: EffectType.shield, value: 4)); logMsg = "+4 Shield"; }
+        break;
+      case 'spirit':
+        if (count >= 9) {
+          enemy.addEffect(StatusEffect(type: EffectType.damageReduce, value: 4));
+          logMsg = "Weaken musuh (4 Turn)";
+        } else if (count >= 6) {
+          enemy.addEffect(StatusEffect(type: EffectType.damageReduce, value: 2));
+          logMsg = "Weaken musuh (2 Turn)";
+        } else if (count >= 3) {
+          enemy.addEffect(StatusEffect(type: EffectType.damageReduce, value: 1));
+          logMsg = "Weaken musuh (1 Turn)";
+        }
+        break;
+      case 'fire':
+        if (count >= 6) {
+          enemy.addEffect(StatusEffect(type: EffectType.dot, value: 12));
+          enemy.addEffect(StatusEffect(type: EffectType.vulnerable, value: 2));
+          logMsg = "DoT 12, Vulnerable (2 Turn)";
+        } else if (count >= 4) {
+          enemy.addEffect(StatusEffect(type: EffectType.dot, value: 7));
+          logMsg = "DoT 7";
+        } else if (count >= 2) {
+          enemy.addEffect(StatusEffect(type: EffectType.dot, value: 3));
+          logMsg = "DoT 3";
+        }
+        break;
+      case 'toxic':
+        if (count >= 6) {
+          enemy.addEffect(StatusEffect(type: EffectType.dot, value: 10));
+          enemy.addEffect(StatusEffect(type: EffectType.damageReduce, value: 2));
+          logMsg = "DoT 10, Weaken (2 Turn)";
+        } else if (count >= 4) {
+          enemy.addEffect(StatusEffect(type: EffectType.dot, value: 5));
+          logMsg = "DoT 5";
+        } else if (count >= 2) {
+          enemy.addEffect(StatusEffect(type: EffectType.dot, value: 2));
+          logMsg = "DoT 2";
+        }
+        break;
+      case 'cosmic':
+        if (count >= 5) {
+          enemy.addEffect(StatusEffect(type: EffectType.vulnerable, value: 4));
+          logMsg = "Vulnerable (4 Turn)";
+        } else if (count >= 4) {
+          enemy.addEffect(StatusEffect(type: EffectType.vulnerable, value: 2));
+          logMsg = "Vulnerable (2 Turn)";
+        } else if (count >= 2) {
+          enemy.addEffect(StatusEffect(type: EffectType.vulnerable, value: 1));
+          logMsg = "Vulnerable (1 Turn)";
+        }
+        break;
+      case 'liquid':
+        if (count >= 6) {
+          player.addEffect(StatusEffect(type: EffectType.heal, value: 6));
+          player.addEffect(StatusEffect(type: EffectType.shield, value: 6));
+          logMsg = "+6 Heal, +6 Shield";
+        } else if (count >= 4) {
+          player.addEffect(StatusEffect(type: EffectType.heal, value: 3));
+          player.addEffect(StatusEffect(type: EffectType.shield, value: 3));
+          logMsg = "+3 Heal, +3 Shield";
+        } else if (count >= 2) {
+          player.addEffect(StatusEffect(type: EffectType.heal, value: 1));
+          player.addEffect(StatusEffect(type: EffectType.shield, value: 1));
+          logMsg = "+1 Heal, +1 Shield";
+        }
+        break;
+      case 'energy':
+        if (count >= 3) {
+          player.addEffect(StatusEffect(type: EffectType.strength, value: 8));
+          logMsg = "+8 Strength";
+        } else if (count >= 2) {
+          player.addEffect(StatusEffect(type: EffectType.strength, value: 3));
+          logMsg = "+3 Strength";
+        } else if (count >= 1) {
+          player.addEffect(StatusEffect(type: EffectType.strength, value: 1));
+          logMsg = "+1 Strength";
+        }
+        break;
+      case 'air':
+        double chance = 0.0;
+        if (count >= 5) chance = 0.5;
+        else if (count >= 4) chance = 0.3;
+        else if (count >= 2) chance = 0.15;
+        
+        if (chance > 0 && Random().nextDouble() < chance) {
+          player.addEffect(StatusEffect(type: EffectType.immunity, value: 1));
+          logMsg = "Immunity (1 Turn)";
+        }
+        break;
+    }
+    
+    if (logMsg.isNotEmpty) {
+      battleLog = "✨ [Sinergi ${meta.synergy}] $logMsg\n$battleLog";
+    }
   }
 
   void onAnimationGlideComplete() {

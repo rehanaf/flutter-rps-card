@@ -7,7 +7,8 @@ enum EffectType {
   immunity, 
   dot, 
   damageReduce, 
-  vulnerable 
+  vulnerable,
+  heal
 }
 
 class StatusEffect {
@@ -23,7 +24,8 @@ class StatusEffect {
       type == EffectType.strength ||
       type == EffectType.shield ||
       type == EffectType.counter ||
-      type == EffectType.immunity;
+      type == EffectType.immunity ||
+      type == EffectType.heal;
 
   bool get isDebuff => !isBuff;
 
@@ -43,6 +45,8 @@ class StatusEffect {
         return "Weaken";
       case EffectType.vulnerable:
         return "Vulnerable";
+      case EffectType.heal:
+        return "Heal";
     }
   }
 
@@ -62,6 +66,8 @@ class StatusEffect {
         return Icons.heart_broken;
       case EffectType.vulnerable:
         return Icons.coronavirus;
+      case EffectType.heal:
+        return Icons.healing_rounded;
     }
   }
 
@@ -81,6 +87,8 @@ class StatusEffect {
         return Colors.grey[700]!;
       case EffectType.vulnerable:
         return Colors.deepOrange[900]!;
+      case EffectType.heal:
+        return Colors.greenAccent[700]!;
     }
   }
 }

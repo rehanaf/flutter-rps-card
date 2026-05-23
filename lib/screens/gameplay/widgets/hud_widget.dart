@@ -8,6 +8,7 @@ class HudWidget extends StatelessWidget {
   final bool isEnemy;
   final int shield;
   final List<StatusEffect> activeEffects;
+  final Map<String, int> activeSynergies;
 
   const HudWidget({
     super.key,
@@ -17,6 +18,7 @@ class HudWidget extends StatelessWidget {
     required this.isEnemy,
     this.shield = 0,
     this.activeEffects = const [],
+    this.activeSynergies = const {},
   });
 
   @override
@@ -30,18 +32,72 @@ class HudWidget extends StatelessWidget {
     final double barWidth = screenSize.width * 0.16; // Sekitar 140 - 160px mendatar
     final double barHeight = barWidth * 0.10;        // Tinggi bar proporsional
 
+    // Helper untuk Synergy Icon & Color
+    Color getSynergyColor(String synergy) {
+      switch (synergy.toLowerCase()) {
+        case 'fire': return const Color(0xFFFF4500);
+        case 'liquid': return const Color(0xFF1E90FF);
+        case 'nature': return const Color(0xFF8B4513);
+        case 'air': return const Color(0xFF87CEEB);
+        case 'robot': return const Color(0xFF9DA5A8);
+        case 'cosmic': return const Color(0xFF9370DB);
+        case 'energy': return const Color(0xFFFFD700);
+        case 'spirit': return const Color(0xFF00CED1);
+        case 'dark': return const Color(0xFF4B0082);
+        case 'ancient': return const Color(0xFFFFD700);
+        case 'toxic': return const Color(0xFFADFF2F);
+        default: return const Color(0xFFC5A059);
+      }
+    }
+
+    IconData getSynergyIcon(String synergy) {
+      switch (synergy.toLowerCase()) {
+        case 'fire': return Icons.local_fire_department_rounded;
+        case 'liquid': return Icons.water_drop_rounded;
+        case 'nature': return Icons.forest_rounded;
+        case 'air': return Icons.wb_cloudy_rounded;
+        case 'robot': return Icons.precision_manufacturing_rounded;
+        case 'cosmic': return Icons.auto_awesome_rounded;
+        case 'energy': return Icons.bolt_rounded;
+        case 'spirit': return Icons.psychology_rounded;
+        case 'dark': return Icons.shield_moon_rounded;
+        case 'ancient': return Icons.gavel_rounded;
+        case 'toxic': return Icons.science_rounded;
+        default: return Icons.layers_rounded;
+      }
+    }
+
     // Komponen Susunan Efek Status Aktif di Bawah HP Bar
     Widget buildStatusEffectsList() {
-      if (activeEffects.isEmpty) return const SizedBox.shrink();
+      if (activeEffects.isEmpty && activeSynergies.isEmpty) return const SizedBox.shrink();
 
-      return Padding(
-        padding: const EdgeInsets.only(top: 6.0),
-        child: Wrap(
-          spacing: 5,
-          runSpacing: 3,
-          alignment: isEnemy ? WrapAlignment.end : WrapAlignment.start,
-          children: activeEffects.map((effect) {
-            return Container(
+      final List<Widget> synergyBadges = activeSynergies.entries.where((e) => e.value > 0).map((entry) {
+        final syn = entry.key;
+        final count = entry.value;
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
+          decoration: BoxDecoration(
+            color: getSynergyColor(syn).withAlpha(204),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: const Color(0xFFC5A059), width: 1.0),
+            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 2, offset: Offset(0, 1))],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(getSynergyIcon(syn), color: Colors.white, size: barHeight * 0.6),
+              const SizedBox(width: 2),
+              Text(
+                "$count",
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: barHeight * 0.55),
+              ),
+            ],
+          ),
+        );
+      }).toList();
+
+      final List<Widget> effectBadges = activeEffects.map((effect) {
+        return Container(
               padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
               decoration: BoxDecoration(
                 color: effect.badgeColor.withAlpha(204),
@@ -67,7 +123,6 @@ class HudWidget extends StatelessWidget {
                     "${effect.value}",
                     style: TextStyle(
                       color: Colors.white,
-                      fontFamily: 'Electrolize',
                       fontWeight: FontWeight.bold,
                       fontSize: barHeight * 0.55,
                     ),
@@ -75,7 +130,15 @@ class HudWidget extends StatelessWidget {
                 ],
               ),
             );
-          }).toList(),
+            }).toList();
+
+      return Padding(
+        padding: const EdgeInsets.only(top: 6.0),
+        child: Wrap(
+          spacing: 5,
+          runSpacing: 3,
+          alignment: isEnemy ? WrapAlignment.end : WrapAlignment.start,
+          children: [...synergyBadges, ...effectBadges],
         ),
       );
     }
@@ -102,7 +165,6 @@ class HudWidget extends StatelessWidget {
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: barHeight * 0.65, // Ukuran teks proporsional terhadap tinggi bar
-                  fontFamily: 'Electrolize',
                   fontWeight: FontWeight.bold,
                   shadows: const [
                     Shadow(
@@ -211,7 +273,6 @@ class HudWidget extends StatelessWidget {
                             "$shield",
                             style: TextStyle(
                               color: Colors.white,
-                              fontFamily: 'Electrolize',
                               fontWeight: FontWeight.bold,
                               fontSize: barHeight * 0.75,
                             ),

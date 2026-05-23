@@ -54,7 +54,9 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
           transform: Matrix4.identity()
             ..translateByDouble(translateX, translateY + (isHovered ? -(dynamicCardWidth / 2) : 0.0), 0.0, 1.0)
             ..rotateZ(isHovered ? 0 : rotationAngle),
-          child: UnconstrainedBox(
+          child: OverflowBox(
+            maxWidth: double.infinity,
+            maxHeight: double.infinity,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
@@ -77,10 +79,6 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
                     _hoveredCardIndex = null;
                   });
                 },
-                child: AnimatedScale(
-                scale: isHovered ? 1.15 : 1.0, 
-                duration: const Duration(milliseconds: 150),
-                curve: Curves.easeOutCubic,
                 child: Draggable<PlayingCard>(
                   data: card,
                   hitTestBehavior: HitTestBehavior.opaque,
@@ -102,6 +100,7 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
                       isPlayerCard: true,
                       width: dynamicCardWidth * 1.15,
                       tooltipOnRight: tooltipOnRight,
+                      disableTooltip: true,
                     ),
                   ),
                   childWhenDragging: Opacity(
@@ -110,7 +109,7 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
                       card: card,
                       isPlayerCard: true,
                       width: dynamicCardWidth,
-                      tooltipOnRight: false, // Sembunyikan/jangan tampilkan saat drag aktif
+                      disableTooltip: true,
                     ),
                   ),
                   child: GameCardWidget(
@@ -119,6 +118,7 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
                     width: dynamicCardWidth,
                     tooltipOnRight: tooltipOnRight,
                     forceShowTooltip: isHovered,
+                    disableTooltip: _isDragging,
                   ),
                 ),
               ),
@@ -126,7 +126,7 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
           ),
         ),
       );
-    });
+  });
 
     // Jika ada kartu yang sedang di-hover, naikkan ke tumpukan paling depan
     if (_hoveredCardIndex != null && _hoveredCardIndex! < fannedCards.length) {

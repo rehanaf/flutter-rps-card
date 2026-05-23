@@ -91,6 +91,11 @@ class Player extends ChangeNotifier {
   }
 
   void addEffect(StatusEffect newEffect) {
+    if (newEffect.type == EffectType.heal) {
+      heal(newEffect.value);
+      return;
+    }
+
     final existingIndex = activeEffects.indexWhere((e) => e.type == newEffect.type);
     
     if (existingIndex != -1) {

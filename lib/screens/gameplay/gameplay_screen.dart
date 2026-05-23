@@ -85,6 +85,7 @@ class GameplayScreen extends StatelessWidget {
                 isEnemy: false,
                 shield: boardState.player.shield,
                 activeEffects: boardState.player.activeEffects,
+                activeSynergies: boardState.playerSynergies,
               ),
             ),
 

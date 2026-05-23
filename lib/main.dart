@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'board/board_state.dart';
 import 'board/player_run.dart';
@@ -8,7 +9,9 @@ import 'screens/gameplay/gameplay_screen.dart';
 import 'screens/main_menu/main_menu_screen.dart';
 import 'screens/map/map_screen.dart';
 import 'screens/shop/shop_screen.dart';
+import 'screens/how_to_play/how_to_play_screen.dart';
 import 'services/app_localizations.dart';
+import 'services/settings_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,10 +31,14 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => PlayerRun()),
         ChangeNotifierProvider(create: (_) => BoardState()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ],
-      child: MaterialApp(
-        title: 'RPS Card Game',
-        debugShowCheckedModeBanner: false,
+      child: Consumer<SettingsProvider>(
+        builder: (context, settingsProvider, child) {
+          return MaterialApp(
+            title: 'RPS Card Game',
+            debugShowCheckedModeBanner: false,
+            locale: settingsProvider.locale,
         
         // ==========================================
         // TEMA UTAMA & FONT OUTFIT GLOBAL
@@ -53,6 +60,9 @@ class MyApp extends StatelessWidget {
         ],
         localizationsDelegates: const [
           AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
         ],
         
         // Rute awal otomatis mengarah ke Main Menu
@@ -74,6 +84,8 @@ class MyApp extends StatelessWidget {
               return MaterialPageRoute(builder: (_) => const CollectionScreen());
             case ShopScreen.routeName:
               return MaterialPageRoute(builder: (_) => const ShopScreen());
+            case HowToPlayScreen.routeName:
+              return MaterialPageRoute(builder: (_) => const HowToPlayScreen());
             default:
               return MaterialPageRoute(
                 builder: (_) => Scaffold(
@@ -82,7 +94,9 @@ class MyApp extends StatelessWidget {
               );
           }
         },
-      ),
-    );
+      );
+    },
+  ),
+);
   }
 }

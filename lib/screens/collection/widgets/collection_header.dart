@@ -40,7 +40,6 @@ class CollectionHeader extends StatelessWidget {
               style: const TextStyle(
                 color: Colors.white30,
                 fontSize: 12,
-                fontFamily: 'Electrolize',
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1,
               ),
