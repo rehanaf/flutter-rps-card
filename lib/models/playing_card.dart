@@ -24,12 +24,16 @@ class CardMetadata {
   final int power;
   final String synergy;
   final String abilityId;
+  final int win;
+  final int lose;
 
   CardMetadata({
     required this.id,
     required this.power,
     required this.synergy,
     required this.abilityId,
+    this.win = 0,
+    this.lose = 0,
   });
 
   factory CardMetadata.fromJson(Map<String, dynamic> json) {
@@ -38,6 +42,8 @@ class CardMetadata {
       power: json['power'] as int,
       synergy: json['synergy'] as String,
       abilityId: json['abilityId'] as String,
+      win: json['win'] as int? ?? 0,
+      lose: json['lose'] as int? ?? 0,
     );
   }
 }

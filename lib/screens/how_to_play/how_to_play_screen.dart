@@ -157,8 +157,7 @@ class _HowToPlayScreenState extends State<HowToPlayScreen> with SingleTickerProv
                             icon: Icons.visibility_rounded,
                             description:
                                 "Untuk menghilangkan tebak-tebakan buta keberuntungan, kami menyediakan Sistem Niat Musuh (Enemy Intent):\n\n"
-                                "• Balon Niat di atas kepala musuh membocorkan tipe Sinergi Kartu (misal: Fire, Cosmic, Toxic) dan Sektor Roda RPS kartu tersebut (Low: 1-33, Mid: 34-67, High: 68-101).\n"
-                                "• Anda bisa menekan tombol 'Teropong (5G)' di balon tersebut untuk membelanjakan 5 Koin Emas petualangan Anda guna mengintip nama kartu asli musuh serta kekuatannya secara transparan!\n"
+                                "• Balon Niat di atas kepala musuh membocorkan tipe Sinergi Kartu (misal: Fire, Cosmic, Toxic) dan Sektor Roda RPS kartu tersebut (Low: 1-33, Mid: 34-67, High: 68-101) melalui bahasa visual (Ikon).\n"
                                 "• Gunakan informasi ini untuk merencanakan serangan balik terbaik dari kartu tangan Anda.",
                           ),
                           _buildRuleTab(

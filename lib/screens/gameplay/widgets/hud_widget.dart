@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/status_effect.dart';
+import '../../../utils/tooltip_helper.dart';
+import '../../../components/custom_tooltip_overlay.dart';
 
 class HudWidget extends StatelessWidget {
   final String name;
@@ -67,6 +69,28 @@ class HudWidget extends StatelessWidget {
       }
     }
 
+    Widget buildTooltipBubble(String title, String description, Color color) {
+      return Container(
+        padding: const EdgeInsets.all(8),
+        width: 150,
+        decoration: BoxDecoration(
+          color: const Color(0xEC1E1E1E),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color, width: 1.0),
+          boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 4, offset: Offset(0, 2))],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(title, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            Text(description, style: const TextStyle(color: Colors.white70, fontSize: 9, height: 1.2)),
+          ],
+        ),
+      );
+    }
+
     // Komponen Susunan Efek Status Aktif di Bawah HP Bar
     Widget buildStatusEffectsList() {
       if (activeEffects.isEmpty && activeSynergies.isEmpty) return const SizedBox.shrink();
@@ -74,62 +98,75 @@ class HudWidget extends StatelessWidget {
       final List<Widget> synergyBadges = activeSynergies.entries.where((e) => e.value > 0).map((entry) {
         final syn = entry.key;
         final count = entry.value;
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
-          decoration: BoxDecoration(
-            color: getSynergyColor(syn).withAlpha(204),
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: const Color(0xFFC5A059), width: 1.0),
-            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 2, offset: Offset(0, 1))],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(getSynergyIcon(syn), color: Colors.white, size: barHeight * 0.6),
-              const SizedBox(width: 2),
-              Text(
-                "$count",
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: barHeight * 0.55),
-              ),
-            ],
+        final Color syncColor = TooltipHelper.getSynergyColor(syn);
+        final IconData syncIcon = getSynergyIcon(syn);
+        final String explanation = TooltipHelper.getSynergyExplanation(syn);
+
+        return CustomTooltipOverlay(
+          tooltipContent: buildTooltipBubble("Synergy: ${syn.toUpperCase()}", explanation, syncColor),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
+            decoration: BoxDecoration(
+              color: syncColor.withAlpha(204),
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: const Color(0xFFC5A059), width: 1.0),
+              boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 2, offset: Offset(0, 1))],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(syncIcon, color: Colors.white, size: barHeight * 0.6),
+                const SizedBox(width: 2),
+                Text(
+                  "$count",
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: barHeight * 0.55),
+                ),
+              ],
+            ),
           ),
         );
       }).toList();
 
       final List<Widget> effectBadges = activeEffects.map((effect) {
-        return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
-              decoration: BoxDecoration(
-                color: effect.badgeColor.withAlpha(204),
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(
-                  color: effect.isBuff ? Colors.white30 : Colors.redAccent.withAlpha(80),
-                  width: 1.0,
+        final String effName = effect.type.toString().split('.').last;
+        final String effDesc = TooltipHelper.getStatusEffectExplanation(effName);
+
+        return CustomTooltipOverlay(
+          tooltipContent: buildTooltipBubble("Efek: ${effName.toUpperCase()}", effDesc, effect.badgeColor),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2.5),
+            decoration: BoxDecoration(
+              color: effect.badgeColor.withAlpha(204),
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(
+                color: effect.isBuff ? Colors.white30 : Colors.redAccent.withAlpha(80),
+                width: 1.0,
+              ),
+              boxShadow: const [
+                BoxShadow(color: Colors.black26, blurRadius: 2, offset: Offset(0, 1)),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  effect.icon,
+                  color: Colors.white,
+                  size: barHeight * 0.6,
                 ),
-                boxShadow: const [
-                  BoxShadow(color: Colors.black26, blurRadius: 2, offset: Offset(0, 1)),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    effect.icon,
+                const SizedBox(width: 2),
+                Text(
+                  "${effect.value}",
+                  style: TextStyle(
                     color: Colors.white,
-                    size: barHeight * 0.6,
+                    fontWeight: FontWeight.bold,
+                    fontSize: barHeight * 0.55,
                   ),
-                  const SizedBox(width: 2),
-                  Text(
-                    "${effect.value}",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: barHeight * 0.55,
-                    ),
-                  ),
-                ],
-              ),
-            );
+                ),
+              ],
+            ),
+          ),
+        );
             }).toList();
 
       return Padding(

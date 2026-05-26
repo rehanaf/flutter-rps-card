@@ -32,11 +32,10 @@ class CharacterDisplayWidget extends StatelessWidget {
 
       final nextCard = boardState.nextEnemyCard;
       if (nextCard != null && boardState.playerCardOnTable == null) {
-        final hintText = boardState.isEnemyCardRevealed
-            ? "${localization.getCardName(nextCard.id)} (${localization.getCardMetadata(nextCard.id)?.power ?? 0} Power)"
-            : boardState.enemyIntentText ?? "Bersiap...";
+        final hintText = boardState.enemyIntentText ?? "Bersiap...";
 
         final icon = boardState.enemyIntentIcon;
+        final sectorIcon = boardState.enemyIntentSectorIcon;
         final color = boardState.enemyIntentColor;
 
         intentBubble = Container(
@@ -46,7 +45,7 @@ class CharacterDisplayWidget extends StatelessWidget {
             color: const Color(0xEC1E1E1E),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: boardState.isEnemyCardRevealed ? const Color(0xFFC5A059) : Colors.white24,
+              color: Colors.white24,
               width: 1.5,
             ),
             boxShadow: [
@@ -60,47 +59,19 @@ class CharacterDisplayWidget extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: color, size: 16),
-              const SizedBox(width: 6),
-              Text(
-                hintText,
-                style: TextStyle(
-                  color: boardState.isEnemyCardRevealed ? const Color(0xFFC5A059) : Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              if (!boardState.isEnemyCardRevealed) ...[
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () {
-                    final success = boardState.revealEnemyCard(playerRun);
-                    if (!success) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Emas tidak cukup! (Butuh 5 Emas)"),
-                          backgroundColor: Colors.redAccent,
-                        ),
-                      );
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFC5A059),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.visibility_rounded, color: Colors.white, size: 10),
-                        SizedBox(width: 3),
-                        Text(
-                          "Teropong (5G)",
-                          style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
+              if (boardState.enemyIntentText != null) ...[
+                Icon(icon, color: color, size: 16),
+                const SizedBox(width: 2),
+                Icon(sectorIcon, color: Colors.white70, size: 16),
+              ] else ...[
+                Icon(icon, color: color, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  "Bersiap...",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
-import '../../../../board/board_state.dart';
-import '../../../../models/playing_card.dart';
-import '../../../../models/status_effect.dart';
-import '../../../../services/app_localizations.dart';
+import '../../../board/board_state.dart';
+import '../../../models/playing_card.dart';
+import '../../../models/status_effect.dart';
+import '../../../utils/tooltip_helper.dart';
+import '../../../services/app_localizations.dart';
 
 class GameCardWidget extends StatefulWidget {
   final PlayingCard card;
@@ -161,18 +162,18 @@ class _GameCardWidgetState extends State<GameCardWidget> {
                           ),
                           const Divider(color: Color(0x26C5A059), height: 10),
                           Text(
-                            _getAbilityExplanation(cardMeta.abilityId),
+                            TooltipHelper.getAbilityExplanation(cardMeta.abilityId),
                             style: const TextStyle(
                               color: Colors.white70,
                               fontSize: 10,
                               height: 1.3,
                             ),
                           ),
-                          if (_getSynergyExplanation(cardMeta.synergy).isNotEmpty) ...[
+                          if (TooltipHelper.getSynergyExplanation(cardMeta.synergy).isNotEmpty) ...[
                             const SizedBox(height: 6),
                             const Divider(color: Color(0x26C5A059), height: 10),
                             Text(
-                              _getSynergyExplanation(cardMeta.synergy),
+                              TooltipHelper.getSynergyExplanation(cardMeta.synergy),
                               style: const TextStyle(
                                 color: Colors.white60,
                                 fontSize: 9.5,
@@ -227,65 +228,7 @@ class _GameCardWidgetState extends State<GameCardWidget> {
     return Color(int.parse('FF$cleanHex', radix: 16));
   }
 
-  String _getAbilityExplanation(String abilityId) {
-    switch (abilityId.toUpperCase()) {
-      case "COUNTER_SHIELD":
-        return "Jika KALAH: Dapatkan +15 Shield.\nJika MENANG: Dapatkan +4 Strength.";
-      case "EXPLODE":
-        return "Dapatkan +5 Strength.";
-      case "BLOCK":
-      case "DEFEND":
-      case "BARRIER":
-        return "Dapatkan +12 Shield.";
-      case "BURN":
-      case "POISON":
-        return "Berikan efek DoT (+6) ke musuh.";
-      case "TRAP":
-      case "BIND":
-        return "Berikan efek Weaken (-25% Damage) ke musuh selama 2 turn.";
-      case "GLOW":
-      case "ORBIT":
-        return "Peluang 25% untuk mendapatkan Immunity (Kebal) selama 1 turn.";
-      case "BLEED":
-      case "STRIKE":
-        return "Berikan efek Vulnerable (+50% Damage masuk) ke musuh selama 2 turn.";
-      case "CALCULATE":
-      case "COMPUTE":
-        return "Dapatkan efek Counter (+8 Damage balasan) ketika diserang.";
-      default:
-        return "Memiliki kemampuan taktis khusus.";
-    }
-  }
-
-  String _getKeywordExplanation(String abilityId) {
-    switch (abilityId.toUpperCase()) {
-      case "COUNTER_SHIELD":
-        return "Shield: Menyerap damage.\nStrength: Meningkatkan damage serangan.";
-      case "EXPLODE":
-        return "Strength: Meningkatkan daya serang dasar Anda secara permanen selama pertempuran.";
-      case "BLOCK":
-      case "DEFEND":
-      case "BARRIER":
-        return "Shield: Mengubah status menjadi Block di awal giliran berikutnya untuk menyerap serangan.";
-      case "BURN":
-      case "POISON":
-        return "DoT (Damage over Time): Mengurangi HP target di awal gilirannya secara berkala.";
-      case "TRAP":
-      case "BIND":
-        return "Weaken: Mengurangi kekuatan serangan target sebesar 25%.";
-      case "GLOW":
-      case "ORBIT":
-        return "Immunity: Membuat target kebal dari segala jenis serangan langsung selama aktif.";
-      case "BLEED":
-      case "STRIKE":
-        return "Vulnerable: Target menerima 50% damage lebih besar dari serangan langsung.";
-      case "CALCULATE":
-      case "COMPUTE":
-        return "Counter: Membalas penyerang dengan damage langsung saat Anda terkena serangan.";
-      default:
-        return "";
-    }
-  }
+  // Helper methods now in TooltipHelper
 
   Color _getSynergyColor(String synergy) {
     switch (synergy.toLowerCase()) {
@@ -500,6 +443,33 @@ class _GameCardWidgetState extends State<GameCardWidget> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 2),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.emoji_events, color: Colors.amber, size: widget.width * 0.06),
+                          const SizedBox(width: 2),
+                          Text(
+                            "${cardMeta?.win ?? 0}",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: widget.width * 0.06,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(Icons.cancel, color: Colors.redAccent, size: widget.width * 0.06),
+                          const SizedBox(width: 2),
+                          Text(
+                            "${cardMeta?.lose ?? 0}",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: widget.width * 0.06,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -512,7 +482,7 @@ class _GameCardWidgetState extends State<GameCardWidget> {
   }
 
   Widget _buildKeywordWidget(String abilityId) {
-    final keyText = _getKeywordExplanation(abilityId);
+    final keyText = TooltipHelper.getKeywordExplanation(abilityId);
     if (keyText.isEmpty) return const SizedBox.shrink();
 
     return Padding(
@@ -572,20 +542,4 @@ class _GameCardWidgetState extends State<GameCardWidget> {
     return Icon(iconData, color: iconColor, size: iconSize);
   }
 
-  String _getSynergyExplanation(String synergy) {
-    switch (synergy.toLowerCase()) {
-      case 'basic': return "Auto-Battler Synergy (Saat Dimainkan):\n[4] +2 Counter\n[8] +4 Counter, +1 Strength\n[12] +8 Counter, +3 Strength";
-      case 'nature': return "Auto-Battler Synergy (Saat Dimainkan):\n[3] +2 Heal\n[6] +5 Heal\n[9] +10 Heal";
-      case 'robot': return "Auto-Battler Synergy (Saat Dimainkan):\n[3] +3 Shield\n[6] +7 Shield\n[9] +15 Shield";
-      case 'ancient': return "Auto-Battler Synergy (Saat Dimainkan):\n[2] +4 Shield\n[4] +8 Shield\n[6] +15 Shield";
-      case 'spirit': return "Auto-Battler Synergy (Saat Dimainkan):\n[3] Weaken (1 Turn)\n[6] Weaken (2 Turn)\n[9] Weaken (4 Turn)";
-      case 'fire': return "Auto-Battler Synergy (Saat Dimainkan):\n[2] DoT 3\n[4] DoT 7\n[6] DoT 12, Vulnerable (2 Turn)";
-      case 'toxic': return "Auto-Battler Synergy (Saat Dimainkan):\n[2] DoT 2\n[4] DoT 5\n[6] DoT 10, Weaken (2 Turn)";
-      case 'cosmic': return "Auto-Battler Synergy (Saat Dimainkan):\n[2] Vulnerable (1 Turn)\n[4] Vulnerable (2 Turn)\n[5] Vulnerable (4 Turn)";
-      case 'liquid': return "Auto-Battler Synergy (Saat Dimainkan):\n[2] +1 Heal, +1 Shield\n[4] +3 Heal, +3 Shield\n[6] +6 Heal, +6 Shield";
-      case 'energy': return "Auto-Battler Synergy (Saat Dimainkan):\n[1] +1 Strength\n[2] +3 Strength\n[3] +8 Strength";
-      case 'air': return "Auto-Battler Synergy (Saat Dimainkan):\n[2] 15% Peluang Immunity\n[4] 30% Peluang Immunity\n[5] 50% Peluang Immunity";
-      default: return "";
-    }
-  }
 }

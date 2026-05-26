@@ -126,17 +126,21 @@ class BoardState extends ChangeNotifier {
     final meta = _cardDataRepository[cardId];
     if (meta == null) return "Bersiap...";
     
-    final int val = int.tryParse(cardId) ?? 0;
-    String sector = "";
-    if (val <= 33) {
-      sector = "Low (1-33)";
-    } else if (val <= 67) {
-      sector = "Mid (34-67)";
-    } else {
-      sector = "High (68-101)";
-    }
+    return meta.synergy;
+  }
 
-    return "${meta.synergy} [Sector $sector]";
+  IconData get enemyIntentSectorIcon {
+    if (nextEnemyCard == null) return Icons.help_outline_rounded;
+    final cardId = nextEnemyCard!.id;
+    
+    final int val = int.tryParse(cardId) ?? 0;
+    if (val <= 33) {
+      return Icons.arrow_downward_rounded;
+    } else if (val <= 67) {
+      return Icons.remove_rounded;
+    } else {
+      return Icons.arrow_upward_rounded;
+    }
   }
 
   IconData get enemyIntentIcon {
