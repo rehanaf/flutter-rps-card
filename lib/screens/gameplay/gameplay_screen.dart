@@ -24,7 +24,7 @@ class GameplayScreen extends StatelessWidget {
     final localization = AppLocalizations.of(context)!;
     final Size screenSize = MediaQuery.of(context).size;
 
-    final double cardWidth = screenSize.width * 0.08;
+    final double cardWidth = screenSize.width * 0.1;
 
     return Scaffold(
       appBar: const GameAppBar(showBackButton: false),
@@ -76,18 +76,13 @@ class GameplayScreen extends StatelessWidget {
 
 
 
-            // ANIMATED TURN & CLASH OVERLAY
-            Positioned.fill(
-              child: IgnorePointer(
-                child: TurnOverlayWidget(overlayData: boardState.activeOverlay),
-              ),
-            ),
+
 
             // KARTU MUSUH DI MEJA (LAYER 4)
             if (boardState.enemyCardOnTable != null)
               AnimatedPositioned(
-                duration: const Duration(milliseconds: 320),
-                curve: Curves.easeOutQuad,
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeOutBack,
                 left: boardState.enemyCardX,
                 top: boardState.enemyCardY,
                 child: GameCardWidget(
@@ -100,8 +95,8 @@ class GameplayScreen extends StatelessWidget {
             // KARTU PLAYER DI MEJA (LAYER 5)
             if (boardState.playerCardOnTable != null)
               AnimatedPositioned(
-                duration: const Duration(milliseconds: 320),
-                curve: Curves.easeOutQuad,
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeOutBack,
                 left: boardState.cardX,
                 top: boardState.cardY,
                 onEnd: () => boardState.onAnimationGlideComplete(screenSize),
@@ -389,6 +384,13 @@ class GameplayScreen extends StatelessWidget {
               ),
             ),
 
+            // ANIMATED TURN & CLASH OVERLAY (Renders on top of all gameplay elements)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: TurnOverlayWidget(overlayData: boardState.activeOverlay),
+              ),
+            ),
+
             // POPUP OVERLAY AKHIR PERTANDINGAN
             if (boardState.player.isDead || boardState.enemy.isDead)
               Positioned.fill(
@@ -459,8 +461,8 @@ class GameplayScreen extends StatelessWidget {
                   Expanded(
                     child: GridView.builder(
                       physics: const BouncingScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 110,
+                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: MediaQuery.of(context).size.width * 0.1 + 30,
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 16,
                         childAspectRatio: 0.7,
@@ -470,7 +472,7 @@ class GameplayScreen extends StatelessWidget {
                         return GameCardWidget(
                           card: cards[index],
                           isPlayerCard: true,
-                          width: 80,
+                          width: MediaQuery.of(context).size.width * 0.1,
                         );
                       },
                     ),
@@ -570,7 +572,7 @@ class GameplayScreen extends StatelessWidget {
                             GameCardWidget(
                               card: playingCard,
                               isPlayerCard: true,
-                              width: 85,
+                              width: MediaQuery.of(context).size.width * 0.1,
                             ),
                             const SizedBox(height: 8),
                             Container(

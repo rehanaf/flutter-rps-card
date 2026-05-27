@@ -28,7 +28,7 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
 
     if (cardCount == 0) return const SizedBox.shrink();
 
-    final double dynamicCardWidth = widget.screenSize.width * 0.13;
+    final double dynamicCardWidth = widget.screenSize.width * 0.1;
 
     // Generate seluruh list widget kartu tangan
     List<Widget> fannedCards = List.generate(cardCount, (index) {
@@ -38,7 +38,7 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
       final double offsetFromCenter = index - midIndex;
 
       final double rotationAngle = offsetFromCenter * 0.05; 
-      final double translateX = offsetFromCenter * (widget.screenSize.width * 0.11);
+      final double translateX = offsetFromCenter * (widget.screenSize.width * 0.08);
       final double translateY = ((offsetFromCenter * offsetFromCenter) * 5.0) + (dynamicCardWidth / 2);
 
       final bool isHovered = index == _hoveredCardIndex && !_isDragging;

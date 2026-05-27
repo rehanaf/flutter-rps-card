@@ -277,7 +277,7 @@ class BoardState extends ChangeNotifier {
     cardX = releaseX;
     cardY = releaseY;
     isAnimating = true;
-    final double cardWidth = screenSize.width * 0.08;
+    final double cardWidth = screenSize.width * 0.1;
     player.hand.remove(card);
     
     // Apply Auto-Battler Synergy instantly
@@ -526,40 +526,44 @@ class BoardState extends ChangeNotifier {
     }
     if (nextEnemyCard == null) return;
 
-    final double cardWidth = screenSize.width * 0.08;
-    enemyCardOnTable = nextEnemyCard;
-    nextEnemyCard = null;
-    battleLog = "Musuh mengeluarkan kartu tandingan! Mengalkulasi hasil...";
-    isBattleCalculated = true;
-
-    // Mulai animasi meluncur dari pojok kanan bawah
-    enemyCardX = screenSize.width;
-    enemyCardY = screenSize.height;
-    isEnemyAnimating = true;
-
+    // 1. Tampilkan overlay giliran musuh terlebih dahulu
     showOverlay(
       title: "GILIRAN MUSUH",
       description: "Musuh menyerang!",
       eventType: "enemy_turn",
     );
 
-    notifyListeners();
-
-    // Luncurkan kartu ke meja tengah-kanan
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 30), () {
-        enemyCardX = screenSize.width * 0.60 - (cardWidth / 2);
-        
-        // Posisi vertikal tengah-tengah body Scaffold (dikurangi tinggi AppBar 56.0)
-        final double bodyHeight = screenSize.height - 56.0;
-        enemyCardY = (bodyHeight / 2) - (cardWidth * 0.7);
-        notifyListeners();
-      });
-    });
-
+    // 2. Berikan jeda 1,2 detik agar overlay muncul terlebih dahulu baru kemudian kartu musuh muncul & meluncur
     Future.delayed(const Duration(milliseconds: 1200), () {
-      isEnemyAnimating = false;
-      _calculateBattleResolution();
+      final double cardWidth = screenSize.width * 0.1;
+      enemyCardOnTable = nextEnemyCard;
+      nextEnemyCard = null;
+      battleLog = "Musuh mengeluarkan kartu tandingan! Mengalkulasi hasil...";
+      isBattleCalculated = true;
+
+      // Mulai animasi meluncur dari pojok kanan bawah (Y diatur ke 0.6 dari tinggi layar)
+      enemyCardX = screenSize.width;
+      enemyCardY = screenSize.height * 0.6;
+      isEnemyAnimating = true;
+      notifyListeners();
+
+      // Luncurkan kartu ke meja tengah-kanan
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(const Duration(milliseconds: 30), () {
+          enemyCardX = screenSize.width * 0.60 - (cardWidth / 2);
+          
+          // Posisi vertikal tengah-tengah body Scaffold (dikurangi tinggi AppBar 56.0)
+          final double bodyHeight = screenSize.height - 56.0;
+          enemyCardY = (bodyHeight / 2) - (cardWidth * 0.7);
+          notifyListeners();
+        });
+      });
+
+      // Tunggu durasi animasi meluncur selesai (1,2 detik) sebelum menghitung hasil pertempuran
+      Future.delayed(const Duration(milliseconds: 1200), () {
+        isEnemyAnimating = false;
+        _calculateBattleResolution();
+      });
     });
   }
 

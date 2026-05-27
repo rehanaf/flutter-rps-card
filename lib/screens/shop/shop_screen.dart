@@ -286,7 +286,7 @@ class _ShopScreenState extends State<ShopScreen> {
                                               GameCardWidget(
                                                 card: playingCard,
                                                 isPlayerCard: true,
-                                                width: screenSize.width * 0.12,
+                                                width: screenSize.width * 0.1,
                                               ),
                                               if (isSold)
                                                 Positioned.fill(

@@ -24,11 +24,11 @@ class CollectionGrid extends StatelessWidget {
       // ====================================================================
       // FIXED: Menggunakan MaxCrossAxisExtent agar Jumlah Kolom Otomatis (Responsive)
       // ====================================================================
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 180,     // Batas lebar maksimal satu kolom (kartu 150 + sisa padding)
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: MediaQuery.of(context).size.width * 0.1 + 30,     // Batas lebar maksimal satu kolom
         crossAxisSpacing: 16,        // Jarak antar kolom
         mainAxisSpacing: 20,         // Jarak antar baris
-        childAspectRatio: 150 / 210, // Mengunci rasio fisik kartu 1:1.4
+        childAspectRatio: 1 / 1.4, // Mengunci rasio fisik kartu 1:1.4
       ),
       // ====================================================================
       itemCount: masterDeck.length,
@@ -39,7 +39,7 @@ class CollectionGrid extends StatelessWidget {
           child: GameCardWidget(
             card: card,
             isPlayerCard: true,
-            width: 150,
+            width: MediaQuery.of(context).size.width * 0.1,
           ),
         );
       },
