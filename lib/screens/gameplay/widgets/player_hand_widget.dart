@@ -98,15 +98,24 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
                 widget.boardState.addGestureLog("Card #${index} (${card.id}) onTapDown - Zoom Active at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)})");
               },
               onTapUp: (details) {
-                widget.boardState.setHoveredCardIndex(null);
                 widget.boardState.updateActiveGesture("IDLE");
                 final pos = details.globalPosition;
                 widget.boardState.addGestureLog("Card #${index} (${card.id}) onTapUp - Zoom Released at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)})");
+                
+                // Jeda 100 milidetik sebelum onHover/zoom mati
+                Future.delayed(const Duration(milliseconds: 100), () {
+                  if (mounted && widget.boardState.hoveredCardIndex == index) {
+                    widget.boardState.setHoveredCardIndex(null);
+                  }
+                });
               },
               child: Draggable<PlayingCard>(
                 data: card,
                 hitTestBehavior: HitTestBehavior.opaque,
                 onDragStarted: () {
+                  // Aktifkan hover index di sini jika onTapDown dilewati karena drag instan!
+                  widget.boardState.setHoveredCardIndex(index);
+                  
                   widget.boardState.draggingCard = card;
                   widget.boardState.isDragOverTarget = false;
                   widget.boardState.updateActiveGesture("DRAGGING");
