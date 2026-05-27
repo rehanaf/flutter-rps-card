@@ -1,66 +1,6 @@
 import 'package:flutter/material.dart';
 
 class TooltipHelper {
-  static String getAbilityExplanation(String abilityId) {
-    switch (abilityId.toUpperCase()) {
-      case "COUNTER_SHIELD":
-        return "Jika KALAH: Dapatkan +15 Shield.\nJika MENANG: Dapatkan +4 Strength.";
-      case "EXPLODE":
-        return "Dapatkan +5 Strength.";
-      case "BLOCK":
-      case "DEFEND":
-      case "BARRIER":
-        return "Dapatkan +12 Shield.";
-      case "BURN":
-      case "POISON":
-        return "Berikan efek DoT (+6) ke musuh.";
-      case "TRAP":
-      case "BIND":
-        return "Berikan efek Weaken (-25% Damage) ke musuh selama 2 turn.";
-      case "GLOW":
-      case "ORBIT":
-        return "Peluang 25% untuk mendapatkan Immunity (Kebal) selama 1 turn.";
-      case "BLEED":
-      case "STRIKE":
-        return "Berikan efek Vulnerable (+50% Damage masuk) ke musuh selama 2 turn.";
-      case "CALCULATE":
-      case "COMPUTE":
-        return "Dapatkan efek Counter (+8 Damage balasan) ketika diserang.";
-      default:
-        return "Memiliki kemampuan taktis khusus.";
-    }
-  }
-
-  static String getKeywordExplanation(String abilityId) {
-    switch (abilityId.toUpperCase()) {
-      case "COUNTER_SHIELD":
-        return "Shield: Menyerap damage.\nStrength: Meningkatkan damage serangan.";
-      case "EXPLODE":
-        return "Strength: Meningkatkan daya serang dasar Anda secara permanen selama pertempuran.";
-      case "BLOCK":
-      case "DEFEND":
-      case "BARRIER":
-        return "Shield: Mengubah status menjadi Block di awal giliran berikutnya untuk menyerap serangan.";
-      case "BURN":
-      case "POISON":
-        return "DoT (Damage over Time): Mengurangi HP target di awal gilirannya secara berkala.";
-      case "TRAP":
-      case "BIND":
-        return "Weaken: Mengurangi kekuatan serangan target sebesar 25%.";
-      case "GLOW":
-      case "ORBIT":
-        return "Immunity: Membuat target kebal dari segala jenis serangan langsung selama aktif.";
-      case "BLEED":
-      case "STRIKE":
-        return "Vulnerable: Target menerima 50% damage lebih besar dari serangan langsung.";
-      case "CALCULATE":
-      case "COMPUTE":
-        return "Counter: Membalas penyerang dengan damage langsung saat Anda terkena serangan.";
-      default:
-        return "";
-    }
-  }
-
   static Color getSynergyColor(String synergy) {
     switch (synergy.toLowerCase()) {
       case 'fire': return const Color(0xFFFF4500);

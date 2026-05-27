@@ -6,9 +6,9 @@ import '../../models/playing_card.dart';
 import '../../models/consumable_card.dart';
 import '../../models/status_effect.dart';
 import '../../services/app_localizations.dart';
+import '../../components/game_app_bar.dart';
 import 'widgets/battle_log_widget.dart';
 import 'widgets/game_card_widget.dart';
-import 'widgets/hud_widget.dart';
 import 'widgets/player_hand_widget.dart';
 import 'widgets/character_display_widget.dart';
 
@@ -23,11 +23,11 @@ class GameplayScreen extends StatelessWidget {
     final playerRun = context.read<PlayerRun>();
     final localization = AppLocalizations.of(context)!;
     final Size screenSize = MediaQuery.of(context).size;
-    final double statusBarPadding = MediaQuery.of(context).padding.top;
 
     final double cardWidth = screenSize.width * 0.13;
 
     return Scaffold(
+      appBar: const GameAppBar(showBackButton: false),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -74,37 +74,10 @@ class GameplayScreen extends StatelessWidget {
               ),
             ),
 
-            // HUD PLAYER
-            Positioned(
-              top: statusBarPadding + 12,
-              left: 24,
-              child: HudWidget(
-                name: boardState.player.name,
-                hp: boardState.player.hp,
-                maxHp: boardState.player.maxHp,
-                isEnemy: false,
-                shield: boardState.player.shield,
-                activeEffects: boardState.player.activeEffects,
-                activeSynergies: boardState.playerSynergies,
-              ),
-            ),
 
-            // HUD MUSUH
-            Positioned(
-              top: statusBarPadding + 12,
-              right: 24,
-              child: HudWidget(
-                name: boardState.enemy.name,
-                hp: boardState.enemy.hp,
-                maxHp: boardState.enemy.maxHp,
-                isEnemy: true,
-                shield: boardState.enemy.shield,
-                activeEffects: boardState.enemy.activeEffects,
-              ),
-            ),
 
             Positioned(
-              top: statusBarPadding + 15,
+              top: 15,
               left: screenSize.width * 0.26,
               right: screenSize.width * 0.26,
               child: Center(
@@ -150,7 +123,7 @@ class GameplayScreen extends StatelessWidget {
               Positioned(
                 left: 16,
                 right: 16,
-                top: statusBarPadding + 76,
+                top: 76,
                 bottom: screenSize.height * 0.32 + 8,
                 child: DragTarget<Object>(
                   onWillAcceptWithDetails: (details) {

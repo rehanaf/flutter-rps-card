@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
         // ==========================================
         theme: ThemeData(
           useMaterial3: true,
-          fontFamily: 'Outfit',
+          fontFamily: 'Familjen Grotesk',
           colorScheme: ColorScheme.fromSeed(
             seedColor: const Color(0xFFC5A059), // Warna emas khas roguelike
             brightness: Brightness.dark,

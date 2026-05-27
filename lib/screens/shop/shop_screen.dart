@@ -5,6 +5,7 @@ import '../../board/player_run.dart';
 import '../../models/playing_card.dart';
 import '../../models/consumable_card.dart';
 import '../../services/app_localizations.dart';
+import '../../components/game_app_bar.dart';
 import '../gameplay/widgets/game_card_widget.dart';
 
 class ShopScreen extends StatefulWidget {
@@ -157,6 +158,7 @@ class _ShopScreenState extends State<ShopScreen> {
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
+      appBar: const GameAppBar(showBackButton: true),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -197,79 +199,25 @@ class _ShopScreenState extends State<ShopScreen> {
                   children: [
                     // HEADER TOKO
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        const Row(
+                        const Icon(Icons.storefront_rounded, color: Color(0xFFC5A059), size: 32),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(Icons.storefront_rounded, color: Color(0xFFC5A059), size: 32),
-                            SizedBox(width: 12),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "TENDA PEDAGANG",
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w900,
-                                    color: Color(0xFFC5A059),
-                                    letterSpacing: 1.5,
-                                  ),
-                                ),
-                                Text(
-                                  "Belanjakan koin emas atau pulihkan HP Anda",
-                                  style: TextStyle(color: Colors.white30, fontSize: 11),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        // HUD KECIL PLAYER
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: const Color(0x1AEEFF3B),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: const Color(0x33C5A059)),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.monetization_on, color: Colors.amber, size: 18),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    "${playerRun.gold} G",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
+                            const Text(
+                              "TENDA PEDAGANG",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFFC5A059),
+                                letterSpacing: 1.5,
                               ),
                             ),
-                            const SizedBox(width: 12),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: const Color(0x1AFF5252),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Colors.redAccent.withAlpha(51)),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.favorite, color: Colors.redAccent, size: 18),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    "${playerRun.currentHp}/${playerRun.maxHp}",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            Text(
+                              "Belanjakan koin emas atau pulihkan HP Anda",
+                              style: TextStyle(color: const Color(0x4DFFFFFF), fontSize: 11),
                             ),
                           ],
                         ),

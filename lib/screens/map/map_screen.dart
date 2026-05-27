@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../board/board_state.dart';
 import '../../board/player_run.dart';
 import '../../services/app_localizations.dart';
+import '../../components/game_app_bar.dart';
 import '../gameplay/gameplay_screen.dart';
 import '../shop/shop_screen.dart';
 
@@ -150,35 +151,7 @@ class MapScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'DUNGEON MAP - FLOOR ${playerRun.currentFloor}',
-          style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2),
-        ),
-        backgroundColor: const Color(0xFF1A1A1A),
-        foregroundColor: const Color(0xFFC5A059),
-        automaticallyImplyLeading: false,
-        actions: [
-          Row(
-            children: [
-              const Icon(Icons.favorite, color: Colors.redAccent, size: 20),
-              const SizedBox(width: 6),
-              Text(
-                '${playerRun.currentHp}/${playerRun.maxHp}',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(width: 20),
-              const Icon(Icons.monetization_on, color: Colors.amber, size: 20),
-              const SizedBox(width: 6),
-              Text(
-                '${playerRun.gold}G',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(width: 16),
-            ],
-          )
-        ],
-      ),
+      appBar: const GameAppBar(showBackButton: false),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(

@@ -479,6 +479,9 @@ class BoardState extends ChangeNotifier {
   // ====================================================================
 
   void applyStartTurnEffects(Player activePlayer) {
+    // Reset block riil dari turn sebelumnya terlebih dahulu (Block bertahan hanya 1 turn)
+    activePlayer.shield = 0;
+
     // Cek 'shield': Jika ada, tambahkan block gratis sebesar nilai value.
     if (activePlayer.hasEffect(EffectType.shield)) {
       final shieldEffect = activePlayer.getEffect(EffectType.shield);
@@ -688,69 +691,72 @@ class BoardState extends ChangeNotifier {
     final eMeta = _cardDataRepository[enemyCard.id];
 
     if (pMeta != null) {
-      _executeAbility(pMeta.abilityId, player, enemy, result);
+      if (result == BattleResult.win) {
+        _applyEffects(pMeta.win, player, enemy, isWin: true);
+      } else if (result == BattleResult.lose) {
+        _applyEffects(pMeta.lose, player, enemy, isWin: false);
+      }
     }
     if (eMeta != null) {
-      // Untuk musuh, hasilnya berlawanan
-      BattleResult enemyResult = BattleResult.draw;
-      if (result == BattleResult.win) enemyResult = BattleResult.lose;
-      if (result == BattleResult.lose) enemyResult = BattleResult.win;
-      _executeAbility(eMeta.abilityId, enemy, player, enemyResult);
+      if (result == BattleResult.lose) {
+        _applyEffects(eMeta.win, enemy, player, isWin: true);
+      } else if (result == BattleResult.win) {
+        _applyEffects(eMeta.lose, enemy, player, isWin: false);
+      }
     }
   }
 
-  void _executeAbility(String abilityId, Player caster, Player target, BattleResult result) {
-    switch (abilityId) {
-      case "COUNTER_SHIELD":
-        if (result == BattleResult.lose) {
-          caster.addEffect(StatusEffect(type: EffectType.shield, value: 15));
-          battleLog += "\n✨ [Ability] COUNTER_SHIELD: ${caster.name} kalah dan mendapatkan Status Shield (+15).";
-        } else if (result == BattleResult.win) {
-          caster.addEffect(StatusEffect(type: EffectType.strength, value: 4));
-          battleLog += "\n✨ [Ability] COUNTER_SHIELD: ${caster.name} menang dan mendapatkan Strength (+4).";
-        }
-        break;
-      case "EXPLODE":
-        caster.addEffect(StatusEffect(type: EffectType.strength, value: 5));
-        battleLog += "\n🔥 [Ability] EXPLODE: ${caster.name} memperoleh Strength (+5).";
-        break;
-      case "BLOCK":
-      case "DEFEND":
-      case "BARRIER":
-        caster.addEffect(StatusEffect(type: EffectType.shield, value: 12));
-        battleLog += "\n🛡️ [Ability] $abilityId: ${caster.name} bersiap bertahan dengan Status Shield (+12).";
-        break;
-      case "BURN":
-      case "POISON":
-        target.addEffect(StatusEffect(type: EffectType.dot, value: 6));
-        battleLog += "\n🧪 [Ability] $abilityId: ${target.name} terinfeksi DoT (+6).";
-        break;
-      case "TRAP":
-      case "BIND":
-        target.addEffect(StatusEffect(type: EffectType.damageReduce, value: 2));
-        battleLog += "\n🕸️ [Ability] $abilityId: Menurunkan damage output ${target.name} selama 2 turn.";
-        break;
-      case "GLOW":
-      case "ORBIT":
-        // Untuk sinergi Cosmic berbasis peluang 1/4 (25%) untuk memicu immunity
-        if (Random().nextInt(4) == 0) {
-          caster.addEffect(StatusEffect(type: EffectType.immunity, value: 1));
-          battleLog += "\n🌌 [Ability] $abilityId: ${caster.name} memicu IMMUNITY (Kebal) selama 1 turn!";
-        } else {
-          battleLog += "\n🌌 [Ability] $abilityId: Gagal memicu Immunity (Peluang 25%).";
-        }
-        break;
-      case "BLEED":
-      case "STRIKE":
-        target.addEffect(StatusEffect(type: EffectType.vulnerable, value: 2));
-        battleLog += "\n🩸 [Ability] $abilityId: ${target.name} terkena status Vulnerable selama 2 turn.";
-        break;
-      case "CALCULATE":
-      case "COMPUTE":
-        caster.addEffect(StatusEffect(type: EffectType.counter, value: 8));
-        battleLog += "\n⚡ [Ability] $abilityId: ${caster.name} bersiap membalas musuh dengan Status Counter (+8).";
-        break;
-    }
+  void _applyEffects(Map<String, int> effects, Player caster, Player target, {required bool isWin}) {
+    if (effects.isEmpty) return;
+
+    effects.forEach((effectName, value) {
+      if (value <= 0) return;
+
+      String displayEffect = effectName;
+      
+      switch (effectName.toLowerCase()) {
+        case 'strength':
+          caster.addEffect(StatusEffect(type: EffectType.strength, value: value));
+          displayEffect = "Strength (+$value)";
+          break;
+        case 'shield':
+          caster.addEffect(StatusEffect(type: EffectType.shield, value: value));
+          displayEffect = "Shield (+$value)";
+          break;
+        case 'counter':
+          caster.addEffect(StatusEffect(type: EffectType.counter, value: value));
+          displayEffect = "Counter (+$value)";
+          break;
+        case 'immunity':
+          caster.addEffect(StatusEffect(type: EffectType.immunity, value: value));
+          displayEffect = "Immunity (Kebal) selama $value turn";
+          break;
+        case 'heal':
+          caster.hp = (caster.hp + value).clamp(0, caster.maxHp);
+          displayEffect = "Heal (+$value HP)";
+          break;
+        case 'dot':
+          target.addEffect(StatusEffect(type: EffectType.dot, value: value));
+          displayEffect = "DoT (+$value) ke ${target.name}";
+          break;
+        case 'damagereduce':
+        case 'weaken':
+          target.addEffect(StatusEffect(type: EffectType.damageReduce, value: value));
+          displayEffect = "Weaken selama $value turn ke ${target.name}";
+          break;
+        case 'vulnerable':
+          target.addEffect(StatusEffect(type: EffectType.vulnerable, value: value));
+          displayEffect = "Vulnerable selama $value turn ke ${target.name}";
+          break;
+        default:
+          target.addEffect(StatusEffect(type: EffectType.vulnerable, value: value));
+          displayEffect = "$effectName (+$value) ke ${target.name}";
+          break;
+      }
+
+      final String actionStr = isWin ? "MENANG" : "KALAH";
+      battleLog += "\n✨ [Ability] $actionStr: ${caster.name} memicu $displayEffect.";
+    });
   }
 
   void _endMatchProgress() {
