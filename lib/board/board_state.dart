@@ -28,6 +28,50 @@ class TurnOverlayData {
 class BoardState extends ChangeNotifier {
   int currentTurn = 1;
   TurnOverlayData? activeOverlay;
+  int? hoveredCardIndex;
+
+  void setHoveredCardIndex(int? index) {
+    if (hoveredCardIndex == index) return;
+    hoveredCardIndex = index;
+    notifyListeners();
+  }
+
+  void setDragOverTarget(bool isOver, PlayingCard? card, Size screenSize) {
+    if (isDragOverTarget == isOver && previewPlayerCard == card) return;
+    isDragOverTarget = isOver;
+    if (isOver && card != null) {
+      previewPlayerCard = card;
+      final double cardWidth = screenSize.width * 0.1;
+      cardX = screenSize.width * 0.40 - (cardWidth / 2);
+      final double bodyHeight = screenSize.height - 56.0;
+      cardY = (bodyHeight / 2) - (cardWidth * 0.7);
+    } else {
+      previewPlayerCard = null;
+    }
+    notifyListeners();
+  }
+
+  List<String> gestureLogs = [];
+  String activeGestureName = "IDLE";
+  double? gestureX;
+  double? gestureY;
+
+  void updateActiveGesture(String name, {double? x, double? y}) {
+    activeGestureName = name;
+    gestureX = x;
+    gestureY = y;
+    notifyListeners();
+  }
+
+  void addGestureLog(String message) {
+    final now = DateTime.now();
+    final timeStr = "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}.${(now.millisecond ~/ 100)}";
+    gestureLogs.insert(0, "[$timeStr] $message");
+    if (gestureLogs.length > 8) {
+      gestureLogs.removeLast();
+    }
+    notifyListeners();
+  }
 
   void showOverlay({
     required String title,
@@ -65,6 +109,10 @@ class BoardState extends ChangeNotifier {
   PlayingCard? enemyCardOnTable;
   PlayingCard? nextEnemyCard;
   bool isEnemyCardRevealed = false;
+
+  PlayingCard? previewPlayerCard;
+  PlayingCard? draggingCard;
+  bool isDragOverTarget = false;
 
   double cardX = 0;
   double cardY = 0;
@@ -116,6 +164,10 @@ class BoardState extends ChangeNotifier {
     isEnemyAnimating = false;
     appearingCardIds.clear();
     disappearingCardIds.clear();
+    previewPlayerCard = null;
+    draggingCard = null;
+    isDragOverTarget = false;
+    gestureLogs.clear();
     playerSynergies.clear();
     for (var card in playerRun.masterDeck) {
       final meta = allCards[card.id];
@@ -127,6 +179,7 @@ class BoardState extends ChangeNotifier {
     isAnimating = false;
     isPlayerTurn = true;
     isBattleCalculated = false;
+    hoveredCardIndex = null;
     battleLog = "Lawan baru muncul: ${enemy.name}! Bersiaplah!";
 
     // Terapkan efek start turn di awal pertempuran
@@ -274,10 +327,14 @@ class BoardState extends ChangeNotifier {
     if (!isPlayerTurn || playerCardOnTable != null) return;
 
     playerCardOnTable = card;
-    cardX = releaseX;
-    cardY = releaseY;
-    isAnimating = true;
     final double cardWidth = screenSize.width * 0.1;
+    
+    // Set koordinat secara instan ke meja (karena sudah menempel rapi saat pratinjau)
+    cardX = screenSize.width * 0.40 - (cardWidth / 2);
+    final double bodyHeight = screenSize.height - 56.0;
+    cardY = (bodyHeight / 2) - (cardWidth * 0.7);
+    isAnimating = false; // Tidak memerlukan animasi geser lagi
+
     player.hand.remove(card);
     
     // Apply Auto-Battler Synergy instantly
@@ -285,17 +342,8 @@ class BoardState extends ChangeNotifier {
     
     notifyListeners();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 30), () {
-        // FIXED: Dikurangi 45 piksel agar posisi kartu Player bergeser sedikit ke kiri
-        cardX = screenSize.width * 0.40 - (cardWidth / 2);
-        
-        // Posisi vertikal tengah-tengah body Scaffold (dikurangi tinggi AppBar 56.0)
-        final double bodyHeight = screenSize.height - 56.0;
-        cardY = (bodyHeight / 2) - (cardWidth * 0.7);
-        notifyListeners();
-      });
-    });
+    // Picu aksi giliran musuh secara instan karena kartu player tidak memerlukan animasi geser
+    _executeEnemyAIAction(screenSize);
   }
 
   void _applySynergyBonus(PlayingCard card) {

@@ -18,7 +18,6 @@ class PlayerHandWidget extends StatefulWidget {
 }
 
 class _PlayerHandWidgetState extends State<PlayerHandWidget> {
-  int? _hoveredCardIndex;
   bool _isDragging = false;
 
   @override
@@ -41,8 +40,37 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
       final double translateX = offsetFromCenter * (widget.screenSize.width * 0.08);
       final double translateY = ((offsetFromCenter * offsetFromCenter) * 5.0) + (dynamicCardWidth / 2);
 
-      final bool isHovered = index == _hoveredCardIndex && !_isDragging;
+      final int? activeHoverIndex = widget.boardState.hoveredCardIndex;
+      final bool isHovered = index == activeHoverIndex && !widget.boardState.isDragOverTarget;
       final bool tooltipOnRight = translateX < 0; // Kiri -> Tampil Kanan, Kanan -> Tampil Kiri
+
+      final bool isDraggingThisCard = card == widget.boardState.draggingCard;
+      final bool isSnappedToTable = isDraggingThisCard && widget.boardState.isDragOverTarget;
+
+      final double cardHeight = (dynamicCardWidth * 1.4) + 20;
+
+      // 1. Hitung koordinat transformasi untuk center-fly & drop-snap
+      final double finalTranslateX;
+      final double finalTranslateY;
+      final double finalRotation;
+      final double finalScale;
+
+      if (isSnappedToTable) {
+        finalTranslateX = -widget.screenSize.width * 0.10;
+        finalTranslateY = -((widget.screenSize.height - 56.0) * 0.50 - cardHeight / 2);
+        finalRotation = 0.0;
+        finalScale = 1.0;
+      } else if (isHovered) {
+        finalTranslateX = 0.0;
+        finalTranslateY = -(widget.screenSize.height * 0.50 - cardHeight / 2);
+        finalRotation = 0.0;
+        finalScale = 2.0;
+      } else {
+        finalTranslateX = translateX;
+        finalTranslateY = translateY;
+        finalRotation = rotationAngle;
+        finalScale = 1.0;
+      }
 
       return Positioned(
         key: ValueKey('${card.id}_$index'), 
@@ -51,75 +79,72 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOutQuad,
+          transformAlignment: Alignment.center,
           transform: Matrix4.identity()
-            ..translateByDouble(translateX, translateY + (isHovered ? -(dynamicCardWidth / 2) : 0.0), 0.0, 1.0)
-            ..rotateZ(isHovered ? 0 : rotationAngle),
+            ..translateByDouble(finalTranslateX, finalTranslateY, 0.0, 1.0)
+            ..rotateZ(finalRotation)
+            ..scale(finalScale, finalScale, 1.0),
           child: OverflowBox(
+            minWidth: 0.0,
+            minHeight: 0.0,
             maxWidth: double.infinity,
             maxHeight: double.infinity,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () {
-                setState(() {
-                  if (_hoveredCardIndex == index) {
-                    _hoveredCardIndex = null; // Tutup kartu jika diketuk ulang
-                  } else {
-                    _hoveredCardIndex = index; // Buka kartu ini
-                  }
-                });
+              onTapDown: (details) {
+                widget.boardState.setHoveredCardIndex(index);
+                final pos = details.globalPosition;
+                widget.boardState.updateActiveGesture("HOLDING", x: pos.dx, y: pos.dy);
+                widget.boardState.addGestureLog("Card #${index} (${card.id}) onTapDown - Zoom Active at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)})");
               },
-              child: MouseRegion(
-                onEnter: (_) {
+              onTapUp: (details) {
+                widget.boardState.setHoveredCardIndex(null);
+                widget.boardState.updateActiveGesture("IDLE");
+                final pos = details.globalPosition;
+                widget.boardState.addGestureLog("Card #${index} (${card.id}) onTapUp - Zoom Released at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)})");
+              },
+              child: Draggable<PlayingCard>(
+                data: card,
+                hitTestBehavior: HitTestBehavior.opaque,
+                onDragStarted: () {
+                  widget.boardState.draggingCard = card;
+                  widget.boardState.isDragOverTarget = false;
+                  widget.boardState.updateActiveGesture("DRAGGING");
+                  widget.boardState.addGestureLog("Card #${index} (${card.id}) onDragStarted - Drag Active");
                   setState(() {
-                    _hoveredCardIndex = index;
+                    _isDragging = true;
                   });
                 },
-                onExit: (_) {
+                onDragUpdate: (details) {
+                  final pos = details.globalPosition;
+                  widget.boardState.updateActiveGesture("DRAGGING", x: pos.dx, y: pos.dy);
+                },
+                onDragEnd: (details) {
+                  widget.boardState.setHoveredCardIndex(null); // Jari dilepas -> hover mati!
+                  widget.boardState.draggingCard = null;
+                  widget.boardState.isDragOverTarget = false;
+                  widget.boardState.previewPlayerCard = null;
+                  widget.boardState.updateActiveGesture("IDLE");
+                  widget.boardState.addGestureLog("Card onDragEnd - Drag Released at (${details.offset.dx.toStringAsFixed(0)}, ${details.offset.dy.toStringAsFixed(0)})");
                   setState(() {
-                    _hoveredCardIndex = null;
+                    _isDragging = false;
                   });
                 },
-                child: Draggable<PlayingCard>(
-                  data: card,
-                  hitTestBehavior: HitTestBehavior.opaque,
-                  onDragStarted: () {
-                    setState(() {
-                      _hoveredCardIndex = null;
-                      _isDragging = true;
-                    });
-                  },
-                  onDragEnd: (details) {
-                    setState(() {
-                      _isDragging = false;
-                    });
-                  },
-                  feedback: Material(
-                    color: Colors.transparent,
-                    child: GameCardWidget(
-                      card: card,
-                      isPlayerCard: true,
-                      width: dynamicCardWidth * 1.15,
-                      tooltipOnRight: tooltipOnRight,
-                      disableTooltip: true,
-                    ),
-                  ),
-                  childWhenDragging: Opacity(
-                    opacity: 0.15,
-                    child: GameCardWidget(
-                      card: card,
-                      isPlayerCard: true,
-                      width: dynamicCardWidth,
-                      disableTooltip: true,
-                    ),
-                  ),
-                  child: GameCardWidget(
-                    card: card,
-                    isPlayerCard: true,
-                    width: dynamicCardWidth,
-                    tooltipOnRight: tooltipOnRight,
-                    forceShowTooltip: isHovered,
-                    disableTooltip: _isDragging,
-                  ),
+                feedback: const SizedBox.shrink(),
+                childWhenDragging: GameCardWidget(
+                  card: card,
+                  isPlayerCard: true,
+                  width: dynamicCardWidth,
+                  tooltipOnRight: tooltipOnRight,
+                  disableTooltip: true,
+                ),
+                child: GameCardWidget(
+                  card: card,
+                  isPlayerCard: true,
+                  width: dynamicCardWidth,
+                  tooltipOnRight: tooltipOnRight,
+                  forceShowTooltip: isHovered,
+                  disableTooltip: _isDragging,
                 ),
               ),
             ),
@@ -129,8 +154,9 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
   });
 
     // Jika ada kartu yang sedang di-hover, naikkan ke tumpukan paling depan
-    if (_hoveredCardIndex != null && _hoveredCardIndex! < fannedCards.length) {
-      final Widget hoveredWidget = fannedCards.removeAt(_hoveredCardIndex!);
+    final int? activeHoverIndex = widget.boardState.hoveredCardIndex;
+    if (activeHoverIndex != null && activeHoverIndex < fannedCards.length) {
+      final Widget hoveredWidget = fannedCards.removeAt(activeHoverIndex);
       fannedCards.add(hoveredWidget);
     }
 

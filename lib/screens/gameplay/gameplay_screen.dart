@@ -38,28 +38,49 @@ class GameplayScreen extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // WALLPAPER BACKGROUND
+            // WALLPAPER BACKGROUND WITH OVERLAY
             Positioned.fill(
-              child: Image.asset(
-                'assets/images/background/main_menu_bg.jpg',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(color: const Color(0xFF0F0F0F));
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTapDown: (details) {
+                  boardState.setHoveredCardIndex(null);
+                  final pos = details.globalPosition;
+                  boardState.updateActiveGesture("TAP_WALLPAPER", x: pos.dx, y: pos.dy);
+                  boardState.addGestureLog("Background wallpaper onTapDown at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)}) - Clear Zoom");
                 },
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      'assets/images/background/main_menu_bg.jpg',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(color: const Color(0xFF0F0F0F));
+                      },
+                    ),
+                    Container(color: const Color(0x66000000)),
+                  ],
+                ),
               ),
-            ),
-            Positioned.fill(
-              child: Container(color: const Color(0x66000000)),
             ),
 
             // KARAKTER PLAYER (SLAY THE SPIRE STYLE)
             Positioned(
               left: screenSize.width * 0.08,
               bottom: screenSize.height * 0.32 + 20,
-              child: CharacterDisplayWidget(
-                isPlayer: true,
-                width: screenSize.width * 0.22,
-                height: screenSize.height * 0.28,
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTapDown: (details) {
+                  boardState.setHoveredCardIndex(null);
+                  final pos = details.globalPosition;
+                  boardState.updateActiveGesture("TAP_PLAYER_CHAR", x: pos.dx, y: pos.dy);
+                  boardState.addGestureLog("Player Character onTapDown at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)}) - Clear Zoom");
+                },
+                child: CharacterDisplayWidget(
+                  isPlayer: true,
+                  width: screenSize.width * 0.22,
+                  height: screenSize.height * 0.28,
+                ),
               ),
             ),
 
@@ -67,10 +88,19 @@ class GameplayScreen extends StatelessWidget {
             Positioned(
               right: screenSize.width * 0.08,
               bottom: screenSize.height * 0.32 + 20,
-              child: CharacterDisplayWidget(
-                isPlayer: false,
-                width: screenSize.width * 0.22,
-                height: screenSize.height * 0.28,
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTapDown: (details) {
+                  boardState.setHoveredCardIndex(null);
+                  final pos = details.globalPosition;
+                  boardState.updateActiveGesture("TAP_ENEMY_CHAR", x: pos.dx, y: pos.dy);
+                  boardState.addGestureLog("Enemy Character onTapDown at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)}) - Clear Zoom");
+                },
+                child: CharacterDisplayWidget(
+                  isPlayer: false,
+                  width: screenSize.width * 0.22,
+                  height: screenSize.height * 0.28,
+                ),
               ),
             ),
 
@@ -122,62 +152,81 @@ class GameplayScreen extends StatelessWidget {
                 bottom: screenSize.height * 0.32 + 8,
                 child: DragTarget<Object>(
                   onWillAcceptWithDetails: (details) {
+                    if (details.data is PlayingCard) {
+                      boardState.setDragOverTarget(true, details.data as PlayingCard, screenSize);
+                      boardState.addGestureLog("Drag ENTERED DropZone (Pre-Drop Snap Active)");
+                    }
                     return details.data is PlayingCard || details.data is ConsumableCard;
+                  },
+                  onLeave: (data) {
+                    if (data is PlayingCard) {
+                      boardState.setDragOverTarget(false, null, screenSize);
+                      boardState.addGestureLog("Drag LEFT DropZone (Pre-Drop Snap Cancelled)");
+                    }
                   },
                   builder: (context, candidateData, rejectedData) {
                     final isHighlighted = candidateData.isNotEmpty;
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      width: double.infinity,
-                      height: double.infinity,
-                      decoration: BoxDecoration( // Emas menyala saat kartu ditahan di atasnya
-                        border: Border.all(
-                          color: isHighlighted
-                              ? const Color(0xFFC5A059)
-                              : const Color(0x26C5A059),
-                          width: isHighlighted ? 2.5 : 1.5,
+                    return GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTapDown: (details) {
+                        boardState.setHoveredCardIndex(null);
+                        final pos = details.globalPosition;
+                        boardState.updateActiveGesture("TAP_ARENA", x: pos.dx, y: pos.dy);
+                        boardState.addGestureLog("Arena Table onTapDown at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)}) - Clear Zoom");
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        width: double.infinity,
+                        height: double.infinity,
+                        decoration: BoxDecoration( // Emas menyala saat kartu ditahan di atasnya
+                          border: Border.all(
+                            color: isHighlighted
+                                ? const Color(0xFFC5A059)
+                                : const Color(0x26C5A059),
+                            width: isHighlighted ? 2.5 : 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(16), // Menyala tipis
+                          color: isHighlighted // Hitbox transparan agar tetap peka sentuhan
+                              ? const Color(0x14C5A059)
+                              : const Color(0x01FFFFFF),
+                          boxShadow: isHighlighted
+                              ? [
+                                  BoxShadow(
+                                    color: const Color(0x33C5A059),
+                                    blurRadius: 12,
+                                    spreadRadius: 2,
+                                  ),
+                                ]
+                              : null,
                         ),
-                        borderRadius: BorderRadius.circular(16), // Menyala tipis
-                        color: isHighlighted // Hitbox transparan agar tetap peka sentuhan
-                            ? const Color(0x14C5A059)
-                            : const Color(0x01FFFFFF),
-                        boxShadow: isHighlighted
-                            ? [
-                                BoxShadow(
-                                  color: const Color(0x33C5A059),
-                                  blurRadius: 12,
-                                  spreadRadius: 2,
-                                ),
-                              ]
-                            : null,
-                      ),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.ads_click_rounded,
-                              color: isHighlighted
-                                  ? const Color(0xFFC5A059)
-                                  : Colors.white12,
-                              size: 24,
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              isHighlighted
-                                  ? "Lepas Kartu Sekarang!"
-                                  : "Geser Kartu / Ramuan ke Sini",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.ads_click_rounded,
                                 color: isHighlighted
-                                  ? const Color(0xFFC5A059)
-                                  : Colors.white24,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 0.5,
+                                    ? const Color(0xFFC5A059)
+                                    : Colors.white12,
+                                size: 24,
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 6),
+                              Text(
+                                isHighlighted
+                                    ? "Lepas Kartu Sekarang!"
+                                    : "Geser Kartu / Ramuan ke Sini",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: isHighlighted
+                                    ? const Color(0xFFC5A059)
+                                    : Colors.white24,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -190,9 +239,12 @@ class GameplayScreen extends StatelessWidget {
                         details.offset.dy,
                         screenSize,
                       );
+                      boardState.addGestureLog("Drag DROPPED in DropZone (Card Played)");
                     } else if (details.data is ConsumableCard) {
                       _useConsumableCard(context, boardState, playerRun, details.data as ConsumableCard);
+                      boardState.addGestureLog("Potion DROPPED in DropZone (Used Potion)");
                     }
+                    boardState.setDragOverTarget(false, null, screenSize);
                   },
                 ),
               ),
@@ -300,75 +352,275 @@ class GameplayScreen extends StatelessWidget {
             Positioned(
               left: 24,
               top: screenSize.height * 0.35,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "SLOT RAMUAN",
-                    style: TextStyle(
-                      color: Color(0xFFC5A059),
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.5,
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTapDown: (details) {
+                  boardState.setHoveredCardIndex(null);
+                  final pos = details.globalPosition;
+                  boardState.updateActiveGesture("TAP_POTION_SLOTS", x: pos.dx, y: pos.dy);
+                  boardState.addGestureLog("Potion Slots Column onTapDown at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)}) - Clear Zoom");
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "SLOT RAMUAN",
+                      style: TextStyle(
+                        color: Color(0xFFC5A059),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.5,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: List.generate(2, (index) {
-                      final slots = playerRun.consumableSlots;
-                      final hasConsumable = index < slots.length;
-                      final String? consumableId = hasConsumable ? slots[index] : null;
-                      final consumable = consumableId != null ? ConsumableCard.getById(consumableId) : null;
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: List.generate(2, (index) {
+                        final slots = playerRun.consumableSlots;
+                        final hasConsumable = index < slots.length;
+                        final String? consumableId = hasConsumable ? slots[index] : null;
+                        final consumable = consumableId != null ? ConsumableCard.getById(consumableId) : null;
 
-                      return Container(
-                        margin: const EdgeInsets.only(right: 12),
-                        width: 58,
-                        height: 76,
-                        decoration: BoxDecoration(
-                          color: const Color(0x14FFFFFF),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: consumable != null
-                                ? consumable.themeColor.withAlpha(120)
-                                : const Color(0x26C5A059),
-                            width: consumable != null ? 1.5 : 1.0,
+                        return Container(
+                          margin: const EdgeInsets.only(right: 12),
+                          width: 58,
+                          height: 76,
+                          decoration: BoxDecoration(
+                            color: const Color(0x14FFFFFF),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: consumable != null
+                                  ? consumable.themeColor.withAlpha(120)
+                                  : const Color(0x26C5A059),
+                              width: consumable != null ? 1.5 : 1.0,
+                            ),
+                            boxShadow: consumable != null
+                                ? [
+                                    BoxShadow(
+                                      color: consumable.themeColor.withAlpha(30),
+                                      blurRadius: 6,
+                                      spreadRadius: 1,
+                                    )
+                                  ]
+                                : null,
                           ),
-                          boxShadow: consumable != null
-                              ? [
-                                  BoxShadow(
-                                    color: consumable.themeColor.withAlpha(30),
-                                    blurRadius: 6,
-                                    spreadRadius: 1,
-                                  )
-                                ]
-                              : null,
-                        ),
-                        child: consumable != null
-                            ? Draggable<ConsumableCard>(
-                                data: consumable,
-                                feedback: Material(
-                                  color: Colors.transparent,
-                                  child: _buildConsumableCardWidget(consumable, 58, 76, true),
-                                ),
-                                childWhenDragging: Opacity(
-                                  opacity: 0.25,
+                          child: consumable != null
+                              ? Draggable<ConsumableCard>(
+                                  data: consumable,
+                                  feedback: Material(
+                                    color: Colors.transparent,
+                                    child: _buildConsumableCardWidget(consumable, 58, 76, true),
+                                  ),
+                                  childWhenDragging: Opacity(
+                                    opacity: 0.25,
+                                    child: _buildConsumableCardWidget(consumable, 58, 76, false),
+                                  ),
                                   child: _buildConsumableCardWidget(consumable, 58, 76, false),
+                                )
+                              : const Center(
+                                  child: Icon(
+                                    Icons.hourglass_empty_rounded,
+                                    color: Colors.white12,
+                                    size: 20,
+                                  ),
                                 ),
-                                child: _buildConsumableCardWidget(consumable, 58, 76, false),
-                              )
-                            : const Center(
-                                child: Icon(
-                                  Icons.hourglass_empty_rounded,
-                                  color: Colors.white12,
-                                  size: 20,
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // PANEL LIVE LOG GESTURE (SEMENTARA UNTUK PERCOBAAN USER)
+            Positioned(
+              left: 24,
+              top: 76,
+              child: IgnorePointer(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  width: 290,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFA0A0A0C), // Suku cadang gelas premium gelap
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFC5A059).withOpacity(0.5), width: 1.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.5),
+                        blurRadius: 8,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.terminal_rounded, color: const Color(0xFFC5A059), size: 14),
+                              const SizedBox(width: 6),
+                              const Text(
+                                "LIVE GESTURE MONITOR",
+                                style: TextStyle(
+                                  color: Color(0xFFC5A059),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.2,
                                 ),
                               ),
-                      );
-                    }),
+                            ],
+                          ),
+                          // BADGE STATUS GESTURE AKTIF
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: boardState.activeGestureName == "IDLE" 
+                                  ? Colors.white.withOpacity(0.05) 
+                                  : (boardState.activeGestureName.startsWith("TAP") 
+                                      ? const Color(0xFF3B82F6).withOpacity(0.15) 
+                                      : const Color(0xFF10B981).withOpacity(0.15)),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: boardState.activeGestureName == "IDLE" 
+                                    ? Colors.white10 
+                                    : (boardState.activeGestureName.startsWith("TAP") 
+                                        ? const Color(0xFF3B82F6).withOpacity(0.4) 
+                                        : const Color(0xFF10B981).withOpacity(0.4)),
+                                width: 0.8,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Lampu indikator menyala
+                                Container(
+                                  width: 5,
+                                  height: 5,
+                                  decoration: BoxDecoration(
+                                    color: boardState.activeGestureName == "IDLE" 
+                                        ? Colors.white30 
+                                        : (boardState.activeGestureName.startsWith("TAP") 
+                                            ? const Color(0xFF3B82F6) 
+                                            : const Color(0xFF10B981)),
+                                    shape: BoxShape.circle,
+                                    boxShadow: boardState.activeGestureName == "IDLE" ? null : [
+                                      BoxShadow(
+                                        color: (boardState.activeGestureName.startsWith("TAP") 
+                                            ? const Color(0xFF3B82F6) 
+                                            : const Color(0xFF10B981)).withOpacity(0.6),
+                                        blurRadius: 3,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  boardState.activeGestureName,
+                                  style: TextStyle(
+                                    color: boardState.activeGestureName == "IDLE" 
+                                        ? Colors.white38 
+                                        : (boardState.activeGestureName.startsWith("TAP") 
+                                            ? const Color(0xFF60A5FA) 
+                                            : const Color(0xFF34D399)),
+                                    fontSize: 7.5,
+                                    fontWeight: FontWeight.w900,
+                                    fontFamily: "monospace",
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      // PANEL KOORDINAT REAL-TIME
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.4),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: Colors.white.withOpacity(0.04), width: 1.0),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "TOUCH POSITION:",
+                              style: TextStyle(
+                                color: Colors.white30,
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: "monospace",
+                              ),
+                            ),
+                            Text(
+                              boardState.gestureX != null && boardState.gestureY != null
+                                  ? "X: ${boardState.gestureX!.toStringAsFixed(1)} | Y: ${boardState.gestureY!.toStringAsFixed(1)}"
+                                  : "X: ---.- | Y: ---.-",
+                              style: TextStyle(
+                                color: boardState.gestureX != null ? const Color(0xFFC5A059) : Colors.white24,
+                                fontSize: 9.0,
+                                fontWeight: FontWeight.w900,
+                                fontFamily: "monospace",
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(color: Colors.white10, height: 16),
+                      const Text(
+                        "RECENT EVENTS LOG:",
+                        style: TextStyle(
+                          color: Colors.white30,
+                          fontSize: 8.0,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      if (boardState.gestureLogs.isEmpty)
+                        const Text(
+                          "Waiting for gesture input...",
+                          style: TextStyle(color: Colors.white24, fontSize: 9.5, fontStyle: FontStyle.italic),
+                        )
+                      else
+                        ...boardState.gestureLogs.map((log) {
+                          final isSuccess = log.contains("DropZone") || log.contains("Played") || log.contains("Zoom Active");
+                          final color = isSuccess ? const Color(0xFF34D399) : Colors.white70;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 4.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "> ",
+                                  style: TextStyle(color: Color(0xFFC5A059), fontSize: 9.0, fontFamily: "monospace"),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    log,
+                                    style: TextStyle(
+                                      color: color,
+                                      fontSize: 9.0,
+                                      fontFamily: "monospace",
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
 

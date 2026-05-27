@@ -81,6 +81,8 @@ class _GameCardWidgetState extends State<GameCardWidget> {
   }
 
   void _showTooltipOverlay() {
+    // SEMENTARA DINONAKTIFKAN UNTUK PERCOBAAN USER
+    return;
     if (!mounted || widget.disableTooltip) return;
     _hideTooltipOverlay(); // Hapus yang lama jika ada
     
