@@ -7,7 +7,53 @@ import '../models/status_effect.dart';
 import 'player.dart';
 import 'player_run.dart';
 
+class TurnOverlayData {
+  final String title;
+  final String description;
+  final String eventType; // 'player_turn', 'enemy_turn', 'clash_win', 'clash_lose', 'clash_draw'
+  final String? playerCardId;
+  final String? enemyCardId;
+  final int? turnNumber;
+
+  TurnOverlayData({
+    required this.title,
+    required this.description,
+    required this.eventType,
+    this.playerCardId,
+    this.enemyCardId,
+    this.turnNumber,
+  });
+}
+
 class BoardState extends ChangeNotifier {
+  int currentTurn = 1;
+  TurnOverlayData? activeOverlay;
+
+  void showOverlay({
+    required String title,
+    required String description,
+    required String eventType,
+    String? playerCardId,
+    String? enemyCardId,
+    int? turnNumber,
+  }) {
+    activeOverlay = TurnOverlayData(
+      title: title,
+      description: description,
+      eventType: eventType,
+      playerCardId: playerCardId,
+      enemyCardId: enemyCardId,
+      turnNumber: turnNumber,
+    );
+    notifyListeners();
+
+    // Clear overlay after 1.8 seconds
+    Future.delayed(const Duration(milliseconds: 1800), () {
+      activeOverlay = null;
+      notifyListeners();
+    });
+  }
+
   late Player player;
   late Player enemy;
 
@@ -23,6 +69,10 @@ class BoardState extends ChangeNotifier {
   double cardX = 0;
   double cardY = 0;
   bool isAnimating = false;
+
+  double enemyCardX = 0;
+  double enemyCardY = 0;
+  bool isEnemyAnimating = false;
 
   // ==========================================
   // STATE BARU: MANAJEMEN URUTAN MUNCUL/HILANG KARTU
@@ -61,6 +111,9 @@ class BoardState extends ChangeNotifier {
     enemyCardOnTable = null;
     nextEnemyCard = null;
     isEnemyCardRevealed = false;
+    enemyCardX = 0;
+    enemyCardY = 0;
+    isEnemyAnimating = false;
     appearingCardIds.clear();
     disappearingCardIds.clear();
     playerSynergies.clear();
@@ -83,6 +136,15 @@ class BoardState extends ChangeNotifier {
     // Picu draw bergiliran di awal pertandingan
     triggerDrawSequence(initialDrawCount);
     prepareEnemyNextCard();
+
+    currentTurn = 1;
+    showOverlay(
+      title: "GILIRANMU",
+      description: "Giliran 1",
+      eventType: "player_turn",
+      turnNumber: 1,
+    );
+
     notifyListeners();
   }
 
@@ -215,7 +277,7 @@ class BoardState extends ChangeNotifier {
     cardX = releaseX;
     cardY = releaseY;
     isAnimating = true;
-    final double cardWidth = screenSize.width * 0.13;
+    final double cardWidth = screenSize.width * 0.08;
     player.hand.remove(card);
     
     // Apply Auto-Battler Synergy instantly
@@ -228,8 +290,9 @@ class BoardState extends ChangeNotifier {
         // FIXED: Dikurangi 45 piksel agar posisi kartu Player bergeser sedikit ke kiri
         cardX = screenSize.width * 0.40 - (cardWidth / 2);
         
-        // Posisi vertikal tetap aman di bawah area tengah murni
-        cardY = (screenSize.height / 2) - (cardWidth / 2);
+        // Posisi vertikal tengah-tengah body Scaffold (dikurangi tinggi AppBar 56.0)
+        final double bodyHeight = screenSize.height - 56.0;
+        cardY = (bodyHeight / 2) - (cardWidth * 0.7);
         notifyListeners();
       });
     });
@@ -375,10 +438,10 @@ class BoardState extends ChangeNotifier {
     }
   }
 
-  void onAnimationGlideComplete() {
+  void onAnimationGlideComplete(Size screenSize) {
     if (!isAnimating) return;
     isAnimating = false;
-    _executeEnemyAIAction();
+    _executeEnemyAIAction(screenSize);
   }
 
   // ====================================================================
@@ -457,19 +520,45 @@ class BoardState extends ChangeNotifier {
     }
   }
 
-  void _executeEnemyAIAction() {
+  void _executeEnemyAIAction(Size screenSize) {
     if (nextEnemyCard == null) {
       prepareEnemyNextCard();
     }
     if (nextEnemyCard == null) return;
 
+    final double cardWidth = screenSize.width * 0.08;
     enemyCardOnTable = nextEnemyCard;
     nextEnemyCard = null;
     battleLog = "Musuh mengeluarkan kartu tandingan! Mengalkulasi hasil...";
     isBattleCalculated = true;
+
+    // Mulai animasi meluncur dari pojok kanan bawah
+    enemyCardX = screenSize.width;
+    enemyCardY = screenSize.height;
+    isEnemyAnimating = true;
+
+    showOverlay(
+      title: "GILIRAN MUSUH",
+      description: "Musuh menyerang!",
+      eventType: "enemy_turn",
+    );
+
     notifyListeners();
 
-    Future.delayed(const Duration(seconds: 1), () {
+    // Luncurkan kartu ke meja tengah-kanan
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 30), () {
+        enemyCardX = screenSize.width * 0.60 - (cardWidth / 2);
+        
+        // Posisi vertikal tengah-tengah body Scaffold (dikurangi tinggi AppBar 56.0)
+        final double bodyHeight = screenSize.height - 56.0;
+        enemyCardY = (bodyHeight / 2) - (cardWidth * 0.7);
+        notifyListeners();
+      });
+    });
+
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      isEnemyAnimating = false;
       _calculateBattleResolution();
     });
   }
@@ -557,11 +646,32 @@ class BoardState extends ChangeNotifier {
     if (result == BattleResult.win) {
       battleLog = "Kamu MENANG! Kartu ID ${playerCardOnTable!.id} menyerang musuh.";
       _applyCombatDamage(player, enemy, pDamage);
+      showOverlay(
+        title: "KAMU MENANG!",
+        description: "",
+        eventType: "clash_win",
+        playerCardId: playerCardOnTable!.id,
+        enemyCardId: enemyCardOnTable!.id,
+      );
     } else if (result == BattleResult.lose) {
       battleLog = "Kamu KALAH! Kartu musuh menerobos pertahananmu.";
       _applyCombatDamage(enemy, player, eDamage);
+      showOverlay(
+        title: "KAMU KALAH!",
+        description: "",
+        eventType: "clash_lose",
+        playerCardId: playerCardOnTable!.id,
+        enemyCardId: enemyCardOnTable!.id,
+      );
     } else {
       battleLog = "Hasil SERI! Kedua kartu hancur di meja arena tanpa damage clash.";
+      showOverlay(
+        title: "HASIL SERI!",
+        description: "",
+        eventType: "clash_draw",
+        playerCardId: playerCardOnTable!.id,
+        enemyCardId: enemyCardOnTable!.id,
+      );
     }
 
     // --- SUNTIKKAN CONDITIONAL ABILITY BERDASARKAN BATTLE RESULT ---
@@ -570,6 +680,9 @@ class BoardState extends ChangeNotifier {
     // Kartu meja masuk pembuangan
     player.discardPile.add(playerCardOnTable!);
     enemy.discardPile.add(enemyCardOnTable!);
+
+    // Jeda 2 detik agar player bisa melihat hasil pertarungan dan kartu di meja sebelum berganti turn
+    await Future.delayed(const Duration(milliseconds: 2000));
 
     // --- AKHIR GILIRAN: Jalankan End Turn Effects ---
     applyEndTurnEffects(player);
@@ -593,6 +706,15 @@ class BoardState extends ChangeNotifier {
       // --- AWAL GILIRAN BARU: Jalankan Start Turn Effects ---
       applyStartTurnEffects(player);
       applyStartTurnEffects(enemy);
+
+      // Increment turn and trigger overlay
+      currentTurn++;
+      showOverlay(
+        title: "GILIRANMU",
+        description: "Giliran $currentTurn",
+        eventType: "player_turn",
+        turnNumber: currentTurn,
+      );
 
       // Isi kembali kartu untuk turn berikutnya
       triggerDrawSequence(turnDrawCount);

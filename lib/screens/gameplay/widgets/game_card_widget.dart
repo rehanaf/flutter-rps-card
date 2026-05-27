@@ -275,6 +275,15 @@ class _GameCardWidgetState extends State<GameCardWidget> {
     final cardMeta = localization.getCardMetadata(widget.card.id);
     final cardName = localization.getCardName(widget.card.id);
     
+    final String synergy = cardMeta?.synergy ?? 'basic';
+    final colorsMap = GameCardWidget.synergyColors[synergy.toLowerCase()] ?? GameCardWidget.synergyColors["basic"]!;
+    Color parseHex(String hex) {
+      final clean = hex.replaceAll('#', '');
+      return Color(int.parse('FF$clean', radix: 16));
+    }
+    final Color mainColor = parseHex(colorsMap["main"]!);
+    final Color blendColor = parseHex(colorsMap["blend"]!);
+
     BoardState? boardState;
     try {
       boardState = context.watch<BoardState>();
@@ -328,9 +337,9 @@ class _GameCardWidgetState extends State<GameCardWidget> {
               return Container(
                 margin: EdgeInsets.all(4 * scale),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF6E2B0),
+                  color: mainColor,
                   borderRadius: BorderRadius.circular(32 * scale),
-                  border: Border.all(color: const Color(0xFFD2691E), width: 3 * scale),
+                  border: Border.all(color: blendColor, width: 3 * scale),
                   boxShadow: const [
                     BoxShadow(color: Colors.black87, blurRadius: 6, offset: Offset(0, 3)),
                   ],
@@ -371,6 +380,8 @@ class _GameCardWidgetState extends State<GameCardWidget> {
                             title: cardName,
                             win: _formatWinEffects(displayPower, cardMeta?.win ?? {}),
                             lose: _formatLoseEffects(cardMeta?.lose ?? {}),
+                            mainColor: mainColor,
+                            blendColor: blendColor,
                           ),
                         ),
                       ),
@@ -498,11 +509,21 @@ class _GameCardWidgetState extends State<GameCardWidget> {
 
 class CardPainter extends CustomPainter {
   final String id, title, win, lose;
-  final Color brown = const Color(0xFFD2691E);
-  final Color cream = const Color(0xFFF6E2B0);
+  final Color blendColor;
+  final Color mainColor;
   final Color offWhite = const Color(0xFFFDF5E6);
 
-  CardPainter({required this.id, required this.title, required this.win, required this.lose});
+  Color get brown => blendColor;
+  Color get cream => mainColor;
+
+  CardPainter({
+    required this.id,
+    required this.title,
+    required this.win,
+    required this.lose,
+    required this.mainColor,
+    required this.blendColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {

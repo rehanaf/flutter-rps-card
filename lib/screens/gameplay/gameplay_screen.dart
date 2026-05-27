@@ -7,7 +7,7 @@ import '../../models/consumable_card.dart';
 import '../../models/status_effect.dart';
 import '../../services/app_localizations.dart';
 import '../../components/game_app_bar.dart';
-import 'widgets/battle_log_widget.dart';
+import 'widgets/turn_overlay_widget.dart';
 import 'widgets/game_card_widget.dart';
 import 'widgets/player_hand_widget.dart';
 import 'widgets/character_display_widget.dart';
@@ -24,7 +24,7 @@ class GameplayScreen extends StatelessWidget {
     final localization = AppLocalizations.of(context)!;
     final Size screenSize = MediaQuery.of(context).size;
 
-    final double cardWidth = screenSize.width * 0.13;
+    final double cardWidth = screenSize.width * 0.08;
 
     return Scaffold(
       appBar: const GameAppBar(showBackButton: false),
@@ -76,20 +76,20 @@ class GameplayScreen extends StatelessWidget {
 
 
 
-            Positioned(
-              top: 15,
-              left: screenSize.width * 0.26,
-              right: screenSize.width * 0.26,
-              child: Center(
-                child: BattleLogWidget(logText: boardState.battleLog),
+            // ANIMATED TURN & CLASH OVERLAY
+            Positioned.fill(
+              child: IgnorePointer(
+                child: TurnOverlayWidget(overlayData: boardState.activeOverlay),
               ),
             ),
 
             // KARTU MUSUH DI MEJA (LAYER 4)
             if (boardState.enemyCardOnTable != null)
-              Positioned(
-                left: screenSize.width * 0.60 - (cardWidth / 2),
-                top: (screenSize.height / 2) - (cardWidth / 2),
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 320),
+                curve: Curves.easeOutQuad,
+                left: boardState.enemyCardX,
+                top: boardState.enemyCardY,
                 child: GameCardWidget(
                   card: boardState.enemyCardOnTable!,
                   isPlayerCard: false,
@@ -104,7 +104,7 @@ class GameplayScreen extends StatelessWidget {
                 curve: Curves.easeOutQuad,
                 left: boardState.cardX,
                 top: boardState.cardY,
-                onEnd: () => boardState.onAnimationGlideComplete(),
+                onEnd: () => boardState.onAnimationGlideComplete(screenSize),
                 child: GameCardWidget(
                   card: boardState.playerCardOnTable!,
                   isPlayerCard: true,
