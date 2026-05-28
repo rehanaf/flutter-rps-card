@@ -10,6 +10,8 @@ import '../../components/game_app_bar.dart';
 import 'widgets/turn_overlay_widget.dart';
 import 'widgets/game_card_widget.dart';
 import 'widgets/player_hand_widget.dart';
+import '../../utils/tooltip_helper.dart';
+import '../../components/custom_tooltip_overlay.dart';
 import 'widgets/character_display_widget.dart';
 
 class GameplayScreen extends StatelessWidget {
@@ -64,10 +66,13 @@ class GameplayScreen extends StatelessWidget {
               ),
             ),
 
+            // LAYER 3.5: PLAYER SYNERGIES BAR (FLOATING AT THE TOP, BELOW APPBAR)
+            _buildTopSynergiesBar(context, boardState),
+
             // KARAKTER PLAYER (SLAY THE SPIRE STYLE)
             Positioned(
               left: screenSize.width * 0.08,
-              bottom: screenSize.height * 0.32 + 20,
+              bottom: screenSize.height * 0.32 + 20 - (cardWidth / 2),
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTapDown: (details) {
@@ -87,7 +92,7 @@ class GameplayScreen extends StatelessWidget {
             // KARAKTER MUSUH (SLAY THE SPIRE STYLE)
             Positioned(
               right: screenSize.width * 0.08,
-              bottom: screenSize.height * 0.32 + 20,
+              bottom: screenSize.height * 0.32 + 20 - (cardWidth / 2),
               child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTapDown: (details) {
@@ -149,7 +154,7 @@ class GameplayScreen extends StatelessWidget {
                 left: 16,
                 right: 16,
                 top: 76,
-                bottom: screenSize.height * 0.32 + 8,
+                bottom: screenSize.height * 0.32 + 8 - (cardWidth / 2),
                 child: DragTarget<Object>(
                   onWillAcceptWithDetails: (details) {
                     if (details.data is PlayingCard) {
@@ -248,54 +253,7 @@ class GameplayScreen extends StatelessWidget {
                   },
                 ),
               ),
-            // IKON DECK (KIRI BAWAH)
-            Positioned(
-              left: 24,
-              bottom: 24,
-              child: GestureDetector(
-                onTap: () => _showCardListOverlay(
-                  context,
-                  "KARTU DECK (${boardState.player.deck.length})",
-                  boardState.player.deck,
-                ),
-                behavior: HitTestBehavior.opaque,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        const Icon(
-                          Icons.style_rounded,
-                          color: Color(0xFFC5A059),
-                          size: 46,
-                        ),
-                        Positioned(
-                          bottom: 4,
-                          child: Text(
-                            "${boardState.player.deck.length}",
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    const Text(
-                      "DECK",
-                      style: TextStyle(
-                        color: Colors.white24,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+
 
             // IKON DISCARD PILE (KANAN BAWAH)
             Positioned(
@@ -348,281 +306,9 @@ class GameplayScreen extends StatelessWidget {
               ),
             ),
 
-            // SLOTS KONSUMSI (CONSUMABLE SLOTS) - GAYA BALATRO
-            Positioned(
-              left: 24,
-              top: screenSize.height * 0.35,
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTapDown: (details) {
-                  boardState.setHoveredCardIndex(null);
-                  final pos = details.globalPosition;
-                  boardState.updateActiveGesture("TAP_POTION_SLOTS", x: pos.dx, y: pos.dy);
-                  boardState.addGestureLog("Potion Slots Column onTapDown at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)}) - Clear Zoom");
-                },
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "SLOT RAMUAN",
-                      style: TextStyle(
-                        color: Color(0xFFC5A059),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: List.generate(2, (index) {
-                        final slots = playerRun.consumableSlots;
-                        final hasConsumable = index < slots.length;
-                        final String? consumableId = hasConsumable ? slots[index] : null;
-                        final consumable = consumableId != null ? ConsumableCard.getById(consumableId) : null;
 
-                        return Container(
-                          margin: const EdgeInsets.only(right: 12),
-                          width: 58,
-                          height: 76,
-                          decoration: BoxDecoration(
-                            color: const Color(0x14FFFFFF),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: consumable != null
-                                  ? consumable.themeColor.withAlpha(120)
-                                  : const Color(0x26C5A059),
-                              width: consumable != null ? 1.5 : 1.0,
-                            ),
-                            boxShadow: consumable != null
-                                ? [
-                                    BoxShadow(
-                                      color: consumable.themeColor.withAlpha(30),
-                                      blurRadius: 6,
-                                      spreadRadius: 1,
-                                    )
-                                  ]
-                                : null,
-                          ),
-                          child: consumable != null
-                              ? Draggable<ConsumableCard>(
-                                  data: consumable,
-                                  feedback: Material(
-                                    color: Colors.transparent,
-                                    child: _buildConsumableCardWidget(consumable, 58, 76, true),
-                                  ),
-                                  childWhenDragging: Opacity(
-                                    opacity: 0.25,
-                                    child: _buildConsumableCardWidget(consumable, 58, 76, false),
-                                  ),
-                                  child: _buildConsumableCardWidget(consumable, 58, 76, false),
-                                )
-                              : const Center(
-                                  child: Icon(
-                                    Icons.hourglass_empty_rounded,
-                                    color: Colors.white12,
-                                    size: 20,
-                                  ),
-                                ),
-                        );
-                      }),
-                    ),
-                  ],
-                ),
-              ),
-            ),
 
-            // PANEL LIVE LOG GESTURE (SEMENTARA UNTUK PERCOBAAN USER)
-            Positioned(
-              left: 24,
-              top: 76,
-              child: IgnorePointer(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  width: 290,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFA0A0A0C), // Suku cadang gelas premium gelap
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFC5A059).withOpacity(0.5), width: 1.5),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.5),
-                        blurRadius: 8,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.terminal_rounded, color: const Color(0xFFC5A059), size: 14),
-                              const SizedBox(width: 6),
-                              const Text(
-                                "LIVE GESTURE MONITOR",
-                                style: TextStyle(
-                                  color: Color(0xFFC5A059),
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 1.2,
-                                ),
-                              ),
-                            ],
-                          ),
-                          // BADGE STATUS GESTURE AKTIF
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: boardState.activeGestureName == "IDLE" 
-                                  ? Colors.white.withOpacity(0.05) 
-                                  : (boardState.activeGestureName.startsWith("TAP") 
-                                      ? const Color(0xFF3B82F6).withOpacity(0.15) 
-                                      : const Color(0xFF10B981).withOpacity(0.15)),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: boardState.activeGestureName == "IDLE" 
-                                    ? Colors.white10 
-                                    : (boardState.activeGestureName.startsWith("TAP") 
-                                        ? const Color(0xFF3B82F6).withOpacity(0.4) 
-                                        : const Color(0xFF10B981).withOpacity(0.4)),
-                                width: 0.8,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Lampu indikator menyala
-                                Container(
-                                  width: 5,
-                                  height: 5,
-                                  decoration: BoxDecoration(
-                                    color: boardState.activeGestureName == "IDLE" 
-                                        ? Colors.white30 
-                                        : (boardState.activeGestureName.startsWith("TAP") 
-                                            ? const Color(0xFF3B82F6) 
-                                            : const Color(0xFF10B981)),
-                                    shape: BoxShape.circle,
-                                    boxShadow: boardState.activeGestureName == "IDLE" ? null : [
-                                      BoxShadow(
-                                        color: (boardState.activeGestureName.startsWith("TAP") 
-                                            ? const Color(0xFF3B82F6) 
-                                            : const Color(0xFF10B981)).withOpacity(0.6),
-                                        blurRadius: 3,
-                                        spreadRadius: 1,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  boardState.activeGestureName,
-                                  style: TextStyle(
-                                    color: boardState.activeGestureName == "IDLE" 
-                                        ? Colors.white38 
-                                        : (boardState.activeGestureName.startsWith("TAP") 
-                                            ? const Color(0xFF60A5FA) 
-                                            : const Color(0xFF34D399)),
-                                    fontSize: 7.5,
-                                    fontWeight: FontWeight.w900,
-                                    fontFamily: "monospace",
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      // PANEL KOORDINAT REAL-TIME
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.4),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: Colors.white.withOpacity(0.04), width: 1.0),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "TOUCH POSITION:",
-                              style: TextStyle(
-                                color: Colors.white30,
-                                fontSize: 8.5,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: "monospace",
-                              ),
-                            ),
-                            Text(
-                              boardState.gestureX != null && boardState.gestureY != null
-                                  ? "X: ${boardState.gestureX!.toStringAsFixed(1)} | Y: ${boardState.gestureY!.toStringAsFixed(1)}"
-                                  : "X: ---.- | Y: ---.-",
-                              style: TextStyle(
-                                color: boardState.gestureX != null ? const Color(0xFFC5A059) : Colors.white24,
-                                fontSize: 9.0,
-                                fontWeight: FontWeight.w900,
-                                fontFamily: "monospace",
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Divider(color: Colors.white10, height: 16),
-                      const Text(
-                        "RECENT EVENTS LOG:",
-                        style: TextStyle(
-                          color: Colors.white30,
-                          fontSize: 8.0,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      if (boardState.gestureLogs.isEmpty)
-                        const Text(
-                          "Waiting for gesture input...",
-                          style: TextStyle(color: Colors.white24, fontSize: 9.5, fontStyle: FontStyle.italic),
-                        )
-                      else
-                        ...boardState.gestureLogs.map((log) {
-                          final isSuccess = log.contains("DropZone") || log.contains("Played") || log.contains("Zoom Active");
-                          final color = isSuccess ? const Color(0xFF34D399) : Colors.white70;
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 4.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "> ",
-                                  style: TextStyle(color: Color(0xFFC5A059), fontSize: 9.0, fontFamily: "monospace"),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    log,
-                                    style: TextStyle(
-                                      color: color,
-                                      fontSize: 9.0,
-                                      fontFamily: "monospace",
-                                      height: 1.2,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+
 
             // TANGAN PLAYER (FAN LAYOUT KIPAS RESPONSIF)
             Positioned(
@@ -1049,69 +735,129 @@ class GameplayScreen extends StatelessWidget {
     }
   }
 
-  IconData _getIconData(String iconName) {
-    switch (iconName) {
-      case 'healing':
-        return Icons.healing_rounded;
-      case 'shield':
-        return Icons.shield_rounded;
-      case 'flash_on':
-        return Icons.flash_on_rounded;
-      case 'hardware':
-        return Icons.hardware_rounded;
-      case 'science':
-        return Icons.science_rounded;
-      default:
-        return Icons.help_outline_rounded;
+
+  Widget _buildTopSynergiesBar(BuildContext context, BoardState boardState) {
+    final activeSynergies = boardState.playerSynergies;
+    final activeSynergyEntries = activeSynergies.entries.where((e) => e.value > 0).toList();
+
+    if (activeSynergyEntries.isEmpty) return const SizedBox.shrink();
+
+    return Positioned(
+      top: 12,
+      left: 0,
+      right: 0,
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          decoration: BoxDecoration(
+            color: const Color(0xEC121214),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0x33C5A059), width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.5),
+                blurRadius: 8,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.auto_awesome_rounded,
+                color: Color(0xFFC5A059),
+                size: 14,
+              ),
+              const SizedBox(width: 6),
+              const Text(
+                "AKTIF SYNERGY: ",
+                style: TextStyle(
+                  color: Color(0x8CFFFFFF),
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.0,
+                ),
+              ),
+              ...activeSynergyEntries.map((entry) {
+                final syn = entry.key;
+                final count = entry.value;
+                final Color syncColor = TooltipHelper.getSynergyColor(syn);
+                final IconData syncIcon = _getSynergyIcon(syn);
+                final String explanation = TooltipHelper.getSynergyExplanation(syn);
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  child: CustomTooltipOverlay(
+                    tooltipContent: _buildTooltipBubble("Synergy: ${syn.toUpperCase()}", explanation, syncColor),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: syncColor.withValues(alpha: 0.8),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: const Color(0xFFC5A059), width: 1.0),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(syncIcon, color: Colors.white, size: 12),
+                          const SizedBox(width: 2),
+                          Text(
+                            "$count",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  IconData _getSynergyIcon(String synergy) {
+    switch (synergy.toLowerCase()) {
+      case 'fire': return Icons.local_fire_department_rounded;
+      case 'liquid': return Icons.water_drop_rounded;
+      case 'nature': return Icons.forest_rounded;
+      case 'air': return Icons.wb_cloudy_rounded;
+      case 'robot': return Icons.precision_manufacturing_rounded;
+      case 'cosmic': return Icons.auto_awesome_rounded;
+      case 'energy': return Icons.bolt_rounded;
+      case 'spirit': return Icons.psychology_rounded;
+      case 'dark': return Icons.shield_moon_rounded;
+      case 'ancient': return Icons.gavel_rounded;
+      case 'toxic': return Icons.science_rounded;
+      default: return Icons.layers_rounded;
     }
   }
 
-  Widget _buildConsumableCardWidget(ConsumableCard consumable, double w, double h, bool isFeedback) {
-    return Tooltip(
-      message: "${consumable.name}\n${consumable.description}",
+  Widget _buildTooltipBubble(String title, String description, Color color) {
+    return Container(
       padding: const EdgeInsets.all(8),
-      margin: const EdgeInsets.symmetric(horizontal: 10),
+      width: 150,
       decoration: BoxDecoration(
-        color: const Color(0xEC0F0F0F),
+        color: const Color(0xEC1E1E1E),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFC5A059), width: 1.0),
+        border: Border.all(color: color, width: 1.0),
+        boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 4, offset: Offset(0, 2))],
       ),
-      textStyle: const TextStyle(color: Colors.white, fontSize: 11),
-      child: Container(
-        width: w,
-        height: h,
-        decoration: BoxDecoration(
-          color: const Color(0x26000000),
-          borderRadius: BorderRadius.circular(10),
-          gradient: LinearGradient(
-            colors: [
-              consumable.themeColor.withAlpha(40),
-              Colors.black54,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              _getIconData(consumable.iconName),
-              color: consumable.themeColor,
-              size: isFeedback ? 26 : 20,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              consumable.name.split(' ').last,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: isFeedback ? 9 : 8,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(title, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 4),
+          Text(description, style: const TextStyle(color: Colors.white70, fontSize: 9, height: 1.2)),
+        ],
       ),
     );
   }

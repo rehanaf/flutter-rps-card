@@ -49,27 +49,51 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
 
       final double cardHeight = (dynamicCardWidth * 1.4) + 20;
 
-      // 1. Hitung koordinat transformasi untuk center-fly & drop-snap
+      // 1. Koordinat sudut dek tumpukan (kiri bawah) & pembuangan (kanan bawah) relatif terhadap bottom center
+      final bool isAppearing = widget.boardState.appearingCardIds.contains(card.id);
+      final bool isDisappearing = widget.boardState.disappearingCardIds.contains(card.id);
+
+      final double deckX = 24.0 + (dynamicCardWidth / 2) - (widget.screenSize.width * 0.5);
+      final double discardX = (widget.screenSize.width * 0.5) - 24.0 - (dynamicCardWidth / 2);
+      final double cornerY = (widget.screenSize.height * 0.32) - 40.0;
+
+      // 2. Hitung koordinat transformasi untuk center-fly, drop-snap, draw (appearing), & discard (disappearing)
       final double finalTranslateX;
       final double finalTranslateY;
       final double finalRotation;
       final double finalScale;
+      final double finalOpacity;
 
-      if (isSnappedToTable) {
+      if (isAppearing) {
+        finalTranslateX = deckX;
+        finalTranslateY = cornerY;
+        finalRotation = -0.3;
+        finalScale = 0.15;
+        finalOpacity = 0.3;
+      } else if (isDisappearing) {
+        finalTranslateX = discardX;
+        finalTranslateY = cornerY;
+        finalRotation = 0.3;
+        finalScale = 0.15;
+        finalOpacity = 0.2;
+      } else if (isSnappedToTable) {
         finalTranslateX = -widget.screenSize.width * 0.10;
         finalTranslateY = -((widget.screenSize.height - 56.0) * 0.50 - cardHeight / 2);
         finalRotation = 0.0;
         finalScale = 1.0;
+        finalOpacity = 1.0;
       } else if (isHovered) {
         finalTranslateX = 0.0;
         finalTranslateY = -(widget.screenSize.height * 0.50 - cardHeight / 2);
         finalRotation = 0.0;
         finalScale = 2.0;
+        finalOpacity = 1.0;
       } else {
         finalTranslateX = translateX;
         finalTranslateY = translateY;
         finalRotation = rotationAngle;
         finalScale = 1.0;
+        finalOpacity = 1.0;
       }
 
       return Positioned(
@@ -84,7 +108,11 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
             ..translateByDouble(finalTranslateX, finalTranslateY, 0.0, 1.0)
             ..rotateZ(finalRotation)
             ..scale(finalScale, finalScale, 1.0),
-          child: OverflowBox(
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutQuad,
+            opacity: finalOpacity,
+            child: OverflowBox(
             minWidth: 0.0,
             minHeight: 0.0,
             maxWidth: double.infinity,
@@ -159,7 +187,8 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
             ),
           ),
         ),
-      );
+      ),
+    );
   });
 
     // Jika ada kartu yang sedang di-hover, naikkan ke tumpukan paling depan

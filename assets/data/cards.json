@@ -2,7 +2,7 @@
   "cards": [
     {
       "win": {
-        "strength": 5
+        "self_strength": 5
       },
       "lose": {},
       "id": "1",
@@ -11,7 +11,7 @@
     },
     {
       "win": {
-        "immunity": 1
+        "self_immunity": 1
       },
       "lose": {},
       "id": "2",
@@ -20,7 +20,7 @@
     },
     {
       "win": {
-        "heal": 4
+        "self_heal": 4
       },
       "lose": {},
       "id": "3",
@@ -29,7 +29,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "4",
@@ -38,7 +38,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "5",
@@ -47,7 +47,7 @@
     },
     {
       "win": {
-        "shield": 5
+        "self_delay_shield": 5
       },
       "lose": {},
       "id": "6",
@@ -56,7 +56,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "7",
@@ -65,10 +65,10 @@
     },
     {
       "win": {
-        "strength": 1
+        "self_strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_shield": 5
       },
       "id": "8",
       "power": 7,
@@ -76,10 +76,10 @@
     },
     {
       "win": {
-        "strength": 1
+        "self_strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_shield": 2
       },
       "id": "9",
       "power": 11,
@@ -87,10 +87,10 @@
     },
     {
       "win": {
-        "strength": 1
+        "self_strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_shield": 2
       },
       "id": "10",
       "power": 9,
@@ -98,7 +98,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "11",
@@ -107,7 +107,7 @@
     },
     {
       "win": {
-        "shield": 12
+        "self_delay_shield": 12
       },
       "lose": {},
       "id": "12",
@@ -116,7 +116,7 @@
     },
     {
       "win": {
-        "dot": 6
+        "self_delay_dot": 6
       },
       "lose": {},
       "id": "13",
@@ -125,7 +125,7 @@
     },
     {
       "win": {
-        "shield": 5
+        "self_delay_shield": 5
       },
       "lose": {},
       "id": "14",
@@ -134,7 +134,7 @@
     },
     {
       "win": {
-        "dot": 6
+        "self_delay_dot": 6
       },
       "lose": {},
       "id": "15",
@@ -143,7 +143,7 @@
     },
     {
       "win": {
-        "shield": 5
+        "self_delay_shield": 5
       },
       "lose": {},
       "id": "16",
@@ -152,7 +152,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "17",
@@ -161,10 +161,10 @@
     },
     {
       "win": {
-        "strength": 1
+        "self_strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_shield": 2
       },
       "id": "18",
       "power": 6,
@@ -172,7 +172,7 @@
     },
     {
       "win": {
-        "dot": 6
+        "self_delay_dot": 6
       },
       "lose": {},
       "id": "19",
@@ -181,7 +181,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "20",
@@ -190,10 +190,10 @@
     },
     {
       "win": {
-        "strength": 1
+        "self_strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "21",
       "power": 10,
@@ -201,7 +201,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "22",
@@ -210,7 +210,7 @@
     },
     {
       "win": {
-        "counter": 8
+        "self_delay_counter": 8
       },
       "lose": {},
       "id": "23",
@@ -219,7 +219,7 @@
     },
     {
       "win": {
-        "shield": 12
+        "self_delay_shield": 12
       },
       "lose": {},
       "id": "24",
@@ -228,10 +228,10 @@
     },
     {
       "win": {
-        "dot": 2
+        "self_delay_dot": 2
       },
       "lose": {
-        "vulnerable": 1
+        "self_vulnerable": 1
       },
       "id": "25",
       "power": 9,
@@ -239,7 +239,7 @@
     },
     {
       "win": {
-        "vulnerable": 2
+        "self_vulnerable": 2
       },
       "lose": {},
       "id": "26",
@@ -248,7 +248,7 @@
     },
     {
       "win": {
-        "heal": 4
+        "self_heal": 4
       },
       "lose": {},
       "id": "27",
@@ -257,10 +257,10 @@
     },
     {
       "win": {
-        "dot": 2
+        "self_delay_dot": 2
       },
       "lose": {
-        "vulnerable": 1
+        "self_vulnerable": 1
       },
       "id": "28",
       "power": 9,
@@ -268,7 +268,7 @@
     },
     {
       "win": {
-        "heal": 4
+        "self_heal": 4
       },
       "lose": {},
       "id": "29",
@@ -277,7 +277,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "30",
@@ -286,7 +286,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "31",
@@ -295,7 +295,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "32",
@@ -304,7 +304,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "33",
@@ -313,10 +313,10 @@
     },
     {
       "win": {
-        "strength": 1
+        "self_strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "34",
       "power": 11,
@@ -324,10 +324,10 @@
     },
     {
       "win": {
-        "strength": 1
+        "self_strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "35",
       "power": 8,
@@ -338,7 +338,7 @@
         "strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "36",
       "power": 3,
@@ -349,7 +349,7 @@
         "strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "37",
       "power": 10,
@@ -360,7 +360,7 @@
         "strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "38",
       "power": 6,
@@ -368,7 +368,7 @@
     },
     {
       "win": {
-        "shield": 5
+        "self_delay_shield": 5
       },
       "lose": {},
       "id": "39",
@@ -377,7 +377,7 @@
     },
     {
       "win": {
-        "shield": 5
+        "self_delay_shield": 5
       },
       "lose": {},
       "id": "40",
@@ -395,7 +395,7 @@
     },
     {
       "win": {
-        "shield": 5
+        "self_delay_shield": 5
       },
       "lose": {},
       "id": "42",
@@ -404,7 +404,7 @@
     },
     {
       "win": {
-        "heal": 4
+        "self_heal": 4
       },
       "lose": {},
       "id": "43",
@@ -413,7 +413,7 @@
     },
     {
       "win": {
-        "heal": 4
+        "self_heal": 4
       },
       "lose": {},
       "id": "44",
@@ -422,7 +422,7 @@
     },
     {
       "win": {
-        "heal": 4
+        "self_heal": 4
       },
       "lose": {},
       "id": "45",
@@ -431,7 +431,7 @@
     },
     {
       "win": {
-        "heal": 4
+        "self_heal": 4
       },
       "lose": {},
       "id": "46",
@@ -440,7 +440,7 @@
     },
     {
       "win": {
-        "heal": 4
+        "self_heal": 4
       },
       "lose": {},
       "id": "47",
@@ -449,7 +449,7 @@
     },
     {
       "win": {
-        "heal": 4
+        "self_heal": 4
       },
       "lose": {},
       "id": "48",
@@ -458,10 +458,10 @@
     },
     {
       "win": {
-        "shield": 3
+        "self_delay_shield": 3
       },
       "lose": {
-        "heal": 2
+        "self_heal": 2
       },
       "id": "49",
       "power": 5,
@@ -472,7 +472,7 @@
         "dot": 2
       },
       "lose": {
-        "vulnerable": 1
+        "self_delay_weaken": 1
       },
       "id": "50",
       "power": 8,
@@ -480,7 +480,7 @@
     },
     {
       "win": {
-        "heal": 4
+        "self_heal": 4
       },
       "lose": {},
       "id": "51",
@@ -489,7 +489,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "52",
@@ -501,7 +501,7 @@
         "strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "53",
       "power": 9,
@@ -509,7 +509,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "54",
@@ -521,7 +521,7 @@
         "strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "55",
       "power": 13,
@@ -532,7 +532,7 @@
         "dot": 2
       },
       "lose": {
-        "vulnerable": 1
+        "self_vulnerable": 1
       },
       "id": "56",
       "power": 13,
@@ -543,7 +543,7 @@
         "strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "57",
       "power": 4,
@@ -551,7 +551,7 @@
     },
     {
       "win": {
-        "shield": 4
+        "self_delay_shield": 4
       },
       "lose": {},
       "id": "58",
@@ -560,10 +560,10 @@
     },
     {
       "win": {
-        "shield": 3
+        "self_delay_shield": 3
       },
       "lose": {
-        "heal": 2
+        "self_heal": 2
       },
       "id": "59",
       "power": 4,
@@ -571,7 +571,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "60",
@@ -583,7 +583,7 @@
         "strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "61",
       "power": 5,
@@ -591,7 +591,7 @@
     },
     {
       "win": {
-        "immunity": 1
+        "self_delay_shield": 1
       },
       "lose": {},
       "id": "62",
@@ -600,7 +600,7 @@
     },
     {
       "win": {
-        "shield": 5
+        "self_delay_shield": 5
       },
       "lose": {},
       "id": "63",
@@ -618,7 +618,7 @@
     },
     {
       "win": {
-        "heal": 4
+        "self_heal": 4
       },
       "lose": {},
       "id": "65",
@@ -627,7 +627,7 @@
     },
     {
       "win": {
-        "shield": 5
+        "self_delay_shield": 5
       },
       "lose": {},
       "id": "66",
@@ -636,10 +636,10 @@
     },
     {
       "win": {
-        "shield": 3
+        "self_delay_shield": 3
       },
       "lose": {
-        "heal": 2
+        "self_heal": 2
       },
       "id": "67",
       "power": 5,
@@ -647,7 +647,7 @@
     },
     {
       "win": {
-        "immunity": 1
+        "self_delay_shield": 1
       },
       "lose": {},
       "id": "68",
@@ -656,7 +656,7 @@
     },
     {
       "win": {
-        "immunity": 1
+        "self_delay_shield": 1
       },
       "lose": {},
       "id": "69",
@@ -668,7 +668,7 @@
         "strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "70",
       "power": 8,
@@ -679,7 +679,7 @@
         "strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "71",
       "power": 5,
@@ -690,7 +690,7 @@
         "strength": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "72",
       "power": 4,
@@ -698,10 +698,10 @@
     },
     {
       "win": {
-        "shield": 3
+        "self_delay_shield": 3
       },
       "lose": {
-        "heal": 2
+        "self_heal": 2
       },
       "id": "73",
       "power": 6,
@@ -709,10 +709,10 @@
     },
     {
       "win": {
-        "shield": 3
+        "self_delay_shield": 3
       },
       "lose": {
-        "heal": 2
+        "self_heal": 2
       },
       "id": "74",
       "power": 7,
@@ -720,10 +720,10 @@
     },
     {
       "win": {
-        "shield": 3
+        "self_delay_shield": 3
       },
       "lose": {
-        "heal": 2
+        "self_heal": 2
       },
       "id": "75",
       "power": 8,
@@ -731,7 +731,7 @@
     },
     {
       "win": {
-        "shield": 5
+        "self_delay_shield": 5
       },
       "lose": {},
       "id": "76",
@@ -740,7 +740,7 @@
     },
     {
       "win": {
-        "vulnerable": 1
+        "self_vulnerable": 1
       },
       "lose": {},
       "id": "77",
@@ -749,7 +749,7 @@
     },
     {
       "win": {
-        "vulnerable": 1
+        "self_vulnerable": 1
       },
       "lose": {},
       "id": "78",
@@ -758,7 +758,7 @@
     },
     {
       "win": {
-        "vulnerable": 1
+        "self_vulnerable": 1
       },
       "lose": {},
       "id": "79",
@@ -767,7 +767,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "80",
@@ -776,7 +776,7 @@
     },
     {
       "win": {
-        "heal": 4
+        "self_heal": 4
       },
       "lose": {},
       "id": "81",
@@ -785,7 +785,7 @@
     },
     {
       "win": {
-        "shield": 4
+        "self_delay_shield": 4
       },
       "lose": {},
       "id": "82",
@@ -803,7 +803,7 @@
     },
     {
       "win": {
-        "shield": 4
+        "self_delay_shield": 4
       },
       "lose": {},
       "id": "84",
@@ -812,10 +812,10 @@
     },
     {
       "win": {
-        "strength": 1
+        "self_delay_counter": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "85",
       "power": 12,
@@ -823,10 +823,10 @@
     },
     {
       "win": {
-        "strength": 1
+        "self_delay_counter": 1
       },
       "lose": {
-        "shield": 2
+        "self_delay_shield": 2
       },
       "id": "86",
       "power": 12,
@@ -834,7 +834,7 @@
     },
     {
       "win": {
-        "shield": 4
+        "self_delay_shield": 4
       },
       "lose": {},
       "id": "87",
@@ -843,7 +843,7 @@
     },
     {
       "win": {
-        "shield": 12
+        "self_delay_shield": 12
       },
       "lose": {},
       "id": "88",
@@ -852,7 +852,7 @@
     },
     {
       "win": {
-        "shield": 5
+        "self_delay_shield": 5
       },
       "lose": {},
       "id": "89",
@@ -861,7 +861,7 @@
     },
     {
       "win": {
-        "counter": 8
+        "self_delay_counter": 8
       },
       "lose": {},
       "id": "90",
@@ -870,7 +870,7 @@
     },
     {
       "win": {
-        "shield": 5
+        "self_delay_shield": 5
       },
       "lose": {},
       "id": "91",
@@ -879,7 +879,7 @@
     },
     {
       "win": {
-        "damageReduce": 2
+        "enemy_delay_weaken": 2
       },
       "lose": {},
       "id": "92",
@@ -888,7 +888,7 @@
     },
     {
       "win": {
-        "strength": 2
+        "self_strength": 2
       },
       "lose": {},
       "id": "93",
@@ -897,7 +897,7 @@
     },
     {
       "win": {
-        "vulnerable": 2
+        "self_vulnerable": 2
       },
       "lose": {},
       "id": "94",
@@ -906,7 +906,7 @@
     },
     {
       "win": {
-        "shield": 4
+        "self_delay_shield": 4
       },
       "lose": {},
       "id": "95",
@@ -915,7 +915,7 @@
     },
     {
       "win": {
-        "strength": 2
+        "self_strength": 2
       },
       "lose": {},
       "id": "96",
@@ -924,7 +924,7 @@
     },
     {
       "win": {
-        "strength": 2
+        "self_strength": 2
       },
       "lose": {},
       "id": "97",
@@ -933,7 +933,7 @@
     },
     {
       "win": {
-        "dot": 3
+        "enemy_delay_dot": 3
       },
       "lose": {},
       "id": "98",
@@ -942,7 +942,7 @@
     },
     {
       "win": {
-        "immunity": 1
+        "self_immunity": 1
       },
       "lose": {},
       "id": "99",
@@ -951,7 +951,7 @@
     },
     {
       "win": {
-        "shield": 5
+        "self_delay_shield": 5
       },
       "lose": {},
       "id": "100",
@@ -960,7 +960,7 @@
     },
     {
       "win": {
-        "shield": 5
+        "self_delay_shield": 5
       },
       "lose": {},
       "id": "101",

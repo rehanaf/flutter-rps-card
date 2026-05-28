@@ -147,7 +147,7 @@ class _GameCardWidgetState extends State<GameCardWidget> {
                         border: Border.all(color: const Color(0xFFC5A059), width: 1.5),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.5),
+                            color: Colors.black.withValues(alpha: 0.5),
                             blurRadius: 6,
                             spreadRadius: 1,
                           ),
@@ -174,7 +174,7 @@ class _GameCardWidgetState extends State<GameCardWidget> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
                                 decoration: BoxDecoration(
-                                  color: _getSynergyColor(cardMeta.synergy).withOpacity(0.15),
+                                  color: _getSynergyColor(cardMeta.synergy).withValues(alpha: 0.15),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -399,27 +399,78 @@ class _GameCardWidgetState extends State<GameCardWidget> {
   }
 
   String _formatEffect(String key, int value) {
-    switch (key.toLowerCase()) {
+    String cleanKey = key.toLowerCase();
+    bool hasDelay = false;
+
+    // 1. Check delay prefix at the start
+    if (cleanKey.startsWith('delay_')) {
+      hasDelay = true;
+      cleanKey = cleanKey.substring(6);
+    }
+    
+    // 2. Check self_ / enemy_ / target_ prefix (strip them out but don't add to-text)
+    if (cleanKey.startsWith('self_')) {
+      cleanKey = cleanKey.substring(5);
+    } else if (cleanKey.startsWith('enemy_')) {
+      cleanKey = cleanKey.substring(6);
+    } else if (cleanKey.startsWith('target_')) {
+      cleanKey = cleanKey.substring(7);
+    }
+
+    // 3. Check delay prefix again (e.g. self_delay_shield)
+    if (cleanKey.startsWith('delay_')) {
+      hasDelay = true;
+      cleanKey = cleanKey.substring(6);
+      
+      // Re-evaluate target prefix in case of delay_self_weaken
+      if (cleanKey.startsWith('self_')) {
+        cleanKey = cleanKey.substring(5);
+      } else if (cleanKey.startsWith('enemy_')) {
+        cleanKey = cleanKey.substring(6);
+      } else if (cleanKey.startsWith('target_')) {
+        cleanKey = cleanKey.substring(7);
+      }
+    }
+
+    // 4. Format based on base effect type
+    String baseText = '';
+    switch (cleanKey) {
       case 'strength':
-        return 'Gain $value Strength';
+        baseText = 'Gain $value Strength';
+        break;
       case 'shield':
-        return 'Gain $value Shield';
+        baseText = 'Gain $value Shield';
+        break;
       case 'counter':
-        return 'Gain $value Counter';
+        baseText = 'Gain $value Counter';
+        break;
       case 'immunity':
-        return 'Gain $value Immunity';
+        baseText = 'Gain $value Immunity';
+        break;
       case 'heal':
-        return 'Heal $value HP';
+        baseText = 'Heal $value HP';
+        break;
       case 'dot':
-        return 'Apply $value DoT';
+        baseText = 'Apply $value DoT';
+        break;
       case 'damagereduce':
       case 'weaken':
-        return 'Apply $value Weaken';
+        baseText = 'Apply $value Weaken';
+        break;
       case 'vulnerable':
-        return 'Apply $value vulnerable';
+        baseText = 'Apply $value vulnerable';
+        break;
       default:
-        return 'Apply $value $key';
+        baseText = 'Apply $value $cleanKey';
+        break;
     }
+
+    // 5. Append next turn suffix if delayed
+    if (hasDelay) {
+      baseText = '$baseText next turn';
+    }
+
+    return baseText;
   }
 
   String _formatWinEffects(int power, Map<String, int> winEffects) {
@@ -539,12 +590,12 @@ class CardPainter extends CustomPainter {
     hexPath.lineTo(560 * scale, 135 * scale);
     hexPath.lineTo(85 * scale, 135 * scale);
     hexPath.close();
-    canvas.drawPath(hexPath, Paint()..color = Colors.black.withOpacity(0.7));
+    canvas.drawPath(hexPath, Paint()..color = Colors.black.withValues(alpha: 0.7));
     canvas.drawPath(hexPath, Paint()..color = brown..strokeWidth = 4 * scale..style = PaintingStyle.stroke);
 
     // 2. Octagon Deskripsi (Bawah)
     final Rect octRect = Rect.fromLTWH(20 * scale, size.height - 240 * scale, 560 * scale, 220 * scale);
-    _drawOctagon(canvas, octRect, 30 * scale, Colors.black.withOpacity(0.7), brown, 4 * scale);
+    _drawOctagon(canvas, octRect, 30 * scale, Colors.black.withValues(alpha: 0.7), brown, 4 * scale);
 
     // 3. Circle ID & Title
     _drawTripleBorderCircle(canvas, Offset(85 * scale, 85 * scale), 65 * scale, scale);
@@ -577,7 +628,7 @@ class CardPainter extends CustomPainter {
   }
 
   void _drawTripleBorderCircle(Canvas canvas, Offset center, double radius, double scale) {
-    canvas.drawCircle(center, radius, Paint()..color = Colors.black.withOpacity(0.7));
+    canvas.drawCircle(center, radius, Paint()..color = Colors.black.withValues(alpha: 0.7));
     canvas.drawCircle(center, radius - 2 * scale, Paint()..color = brown..style = PaintingStyle.stroke..strokeWidth = 2 * scale);
     canvas.drawCircle(center, radius + 2 * scale, Paint()..color = cream..style = PaintingStyle.stroke..strokeWidth = 10 * scale);
     canvas.drawCircle(center, radius + 5 * scale, Paint()..color = brown..style = PaintingStyle.stroke..strokeWidth = 2 * scale);

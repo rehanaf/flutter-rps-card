@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
 import '../models/playing_card.dart';
 import '../models/enemy_metadata.dart';
 import '../models/status_effect.dart';
 import 'player.dart';
 import 'player_run.dart';
+import '../behaviors/behavior_registry.dart';
 
 class TurnOverlayData {
   final String title;
@@ -354,131 +354,9 @@ class BoardState extends ChangeNotifier {
     final count = playerSynergies[synergy] ?? 0;
     String logMsg = "";
 
-    switch (synergy) {
-      case 'basic':
-        if (count >= 12) {
-          player.addEffect(StatusEffect(type: EffectType.counter, value: 8));
-          player.addEffect(StatusEffect(type: EffectType.strength, value: 3));
-          logMsg = "+8 Counter, +3 Strength";
-        } else if (count >= 8) {
-          player.addEffect(StatusEffect(type: EffectType.counter, value: 4));
-          player.addEffect(StatusEffect(type: EffectType.strength, value: 1));
-          logMsg = "+4 Counter, +1 Strength";
-        } else if (count >= 4) {
-          player.addEffect(StatusEffect(type: EffectType.counter, value: 2));
-          logMsg = "+2 Counter";
-        }
-        break;
-      case 'nature':
-        if (count >= 9) {
-          player.addEffect(StatusEffect(type: EffectType.heal, value: 10));
-          logMsg = "+10 Heal";
-        } else if (count >= 6) {
-          player.addEffect(StatusEffect(type: EffectType.heal, value: 5));
-          logMsg = "+5 Heal";
-        } else if (count >= 3) {
-          player.addEffect(StatusEffect(type: EffectType.heal, value: 2));
-          logMsg = "+2 Heal";
-        }
-        break;
-      case 'robot':
-        if (count >= 9) { player.addEffect(StatusEffect(type: EffectType.shield, value: 15)); logMsg = "+15 Shield"; }
-        else if (count >= 6) { player.addEffect(StatusEffect(type: EffectType.shield, value: 7)); logMsg = "+7 Shield"; }
-        else if (count >= 3) { player.addEffect(StatusEffect(type: EffectType.shield, value: 3)); logMsg = "+3 Shield"; }
-        break;
-      case 'ancient':
-        if (count >= 6) { player.addEffect(StatusEffect(type: EffectType.shield, value: 15)); logMsg = "+15 Shield"; }
-        else if (count >= 4) { player.addEffect(StatusEffect(type: EffectType.shield, value: 8)); logMsg = "+8 Shield"; }
-        else if (count >= 2) { player.addEffect(StatusEffect(type: EffectType.shield, value: 4)); logMsg = "+4 Shield"; }
-        break;
-      case 'spirit':
-        if (count >= 9) {
-          enemy.addEffect(StatusEffect(type: EffectType.damageReduce, value: 4));
-          logMsg = "Weaken musuh (4 Turn)";
-        } else if (count >= 6) {
-          enemy.addEffect(StatusEffect(type: EffectType.damageReduce, value: 2));
-          logMsg = "Weaken musuh (2 Turn)";
-        } else if (count >= 3) {
-          enemy.addEffect(StatusEffect(type: EffectType.damageReduce, value: 1));
-          logMsg = "Weaken musuh (1 Turn)";
-        }
-        break;
-      case 'fire':
-        if (count >= 6) {
-          enemy.addEffect(StatusEffect(type: EffectType.dot, value: 12));
-          enemy.addEffect(StatusEffect(type: EffectType.vulnerable, value: 2));
-          logMsg = "DoT 12, Vulnerable (2 Turn)";
-        } else if (count >= 4) {
-          enemy.addEffect(StatusEffect(type: EffectType.dot, value: 7));
-          logMsg = "DoT 7";
-        } else if (count >= 2) {
-          enemy.addEffect(StatusEffect(type: EffectType.dot, value: 3));
-          logMsg = "DoT 3";
-        }
-        break;
-      case 'toxic':
-        if (count >= 6) {
-          enemy.addEffect(StatusEffect(type: EffectType.dot, value: 10));
-          enemy.addEffect(StatusEffect(type: EffectType.damageReduce, value: 2));
-          logMsg = "DoT 10, Weaken (2 Turn)";
-        } else if (count >= 4) {
-          enemy.addEffect(StatusEffect(type: EffectType.dot, value: 5));
-          logMsg = "DoT 5";
-        } else if (count >= 2) {
-          enemy.addEffect(StatusEffect(type: EffectType.dot, value: 2));
-          logMsg = "DoT 2";
-        }
-        break;
-      case 'cosmic':
-        if (count >= 5) {
-          enemy.addEffect(StatusEffect(type: EffectType.vulnerable, value: 4));
-          logMsg = "Vulnerable (4 Turn)";
-        } else if (count >= 4) {
-          enemy.addEffect(StatusEffect(type: EffectType.vulnerable, value: 2));
-          logMsg = "Vulnerable (2 Turn)";
-        } else if (count >= 2) {
-          enemy.addEffect(StatusEffect(type: EffectType.vulnerable, value: 1));
-          logMsg = "Vulnerable (1 Turn)";
-        }
-        break;
-      case 'liquid':
-        if (count >= 6) {
-          player.addEffect(StatusEffect(type: EffectType.heal, value: 6));
-          player.addEffect(StatusEffect(type: EffectType.shield, value: 6));
-          logMsg = "+6 Heal, +6 Shield";
-        } else if (count >= 4) {
-          player.addEffect(StatusEffect(type: EffectType.heal, value: 3));
-          player.addEffect(StatusEffect(type: EffectType.shield, value: 3));
-          logMsg = "+3 Heal, +3 Shield";
-        } else if (count >= 2) {
-          player.addEffect(StatusEffect(type: EffectType.heal, value: 1));
-          player.addEffect(StatusEffect(type: EffectType.shield, value: 1));
-          logMsg = "+1 Heal, +1 Shield";
-        }
-        break;
-      case 'energy':
-        if (count >= 3) {
-          player.addEffect(StatusEffect(type: EffectType.strength, value: 8));
-          logMsg = "+8 Strength";
-        } else if (count >= 2) {
-          player.addEffect(StatusEffect(type: EffectType.strength, value: 3));
-          logMsg = "+3 Strength";
-        } else if (count >= 1) {
-          player.addEffect(StatusEffect(type: EffectType.strength, value: 1));
-          logMsg = "+1 Strength";
-        }
-        break;
-      case 'air':
-        double chance = 0.0;
-        if (count >= 5) chance = 0.5;
-        else if (count >= 4) chance = 0.3;
-        else if (count >= 2) chance = 0.15;
-        
-        if (chance > 0 && Random().nextDouble() < chance) {
-          player.addEffect(StatusEffect(type: EffectType.immunity, value: 1));
-          logMsg = "Immunity (1 Turn)";
-        }
-        break;
+    final behavior = BehaviorRegistry.getSynergy(synergy);
+    if (behavior != null) {
+      logMsg = behavior.apply(player, enemy, count);
     }
     
     if (logMsg.isNotEmpty) {
@@ -554,8 +432,8 @@ class BoardState extends ChangeNotifier {
       disappearingCardIds.add(card.id);
       notifyListeners();
 
-      // Tunggu durasi transisi visual memudar selesai (250ms)
-      await Future.delayed(const Duration(milliseconds: 250));
+      // Tunggu durasi transisi visual meluncur selesai (240ms)
+      await Future.delayed(const Duration(milliseconds: 240));
 
       // 2. Cabut permanen dari data hand asli dan pindahkan ke kuburan tumpukan discardPile
       player.hand.remove(card);
@@ -675,7 +553,18 @@ class BoardState extends ChangeNotifier {
 
     final result = playerCardOnTable!.beats(enemyCardOnTable!);
 
-    // --- LANGKAH A: Hitung base damage kartu + bonus flat dari 'strength' ---
+    // --- PHASE 1: INSTANT ABILITY PHASE ---
+    // Apply instant card abilities before damage calculations (efek aktif dulu)
+    _applyCardAbilities(playerCardOnTable!, enemyCardOnTable!, result, isDelayed: false);
+    
+    // Pemicu Rebuild UI instan agar animasi transient efek instan langsung terlukis
+    notifyListeners();
+    
+    // Jeda 1.5 detik agar animasi transient dari efek instan selesai dimunculkan
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    // --- PHASE 2: COMBAT DAMAGE CALCULATIONS ---
+    // Hitung base damage kartu + bonus flat dari 'strength'
     int pDamage = _cardDataRepository[playerCardOnTable!.id]?.power ?? 20;
     if (player.hasEffect(EffectType.strength)) {
       pDamage += player.getEffect(EffectType.strength).value;
@@ -686,7 +575,7 @@ class BoardState extends ChangeNotifier {
       eDamage += enemy.getEffect(EffectType.strength).value;
     }
 
-    // --- LANGKAH B: Jika penyerang memiliki status 'damageReduce', potong total damage sebesar 25% ---
+    // Jika penyerang memiliki status 'damageReduce', potong total damage sebesar 25%
     if (player.hasEffect(EffectType.damageReduce)) {
       pDamage = (pDamage * 0.75).round();
     }
@@ -726,15 +615,25 @@ class BoardState extends ChangeNotifier {
       );
     }
 
-    // --- SUNTIKKAN CONDITIONAL ABILITY BERDASARKAN BATTLE RESULT ---
-    _applyCardAbilities(playerCardOnTable!, enemyCardOnTable!, result);
+    // Jeda 1.5 detik agar animasi hit shake, get-hit flash, dan damage catch-up HP bar selesai terlukis
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    // --- PHASE 3: DELAYED ABILITY PHASE ---
+    // Apply delayed card abilities after damage calculations (efek next turn)
+    _applyCardAbilities(playerCardOnTable!, enemyCardOnTable!, result, isDelayed: true);
+
+    // Pemicu Rebuild UI instan agar animasi transient efek delayed langsung terlukis
+    notifyListeners();
+
+    // Jeda 1.5 detik agar animasi transient dari efek delayed (next turn) selesai dimunculkan
+    await Future.delayed(const Duration(milliseconds: 1500));
 
     // Kartu meja masuk pembuangan
     player.discardPile.add(playerCardOnTable!);
     enemy.discardPile.add(enemyCardOnTable!);
 
-    // Jeda 2 detik agar player bisa melihat hasil pertarungan dan kartu di meja sebelum berganti turn
-    await Future.delayed(const Duration(milliseconds: 2000));
+    // Jeda 1 detik singkat sebelum transisi giliran baru
+    await Future.delayed(const Duration(milliseconds: 1000));
 
     // --- AKHIR GILIRAN: Jalankan End Turn Effects ---
     applyEndTurnEffects(player);
@@ -860,76 +759,121 @@ class BoardState extends ChangeNotifier {
   // PEMICUAN ABILITY KARTU BERDASARKAN BATTLE RESULT & PELUANG
   // ====================================================================
 
-  void _applyCardAbilities(PlayingCard playerCard, PlayingCard enemyCard, BattleResult result) {
+  void _applyCardAbilities(PlayingCard playerCard, PlayingCard enemyCard, BattleResult result, {required bool isDelayed}) {
     final pMeta = _cardDataRepository[playerCard.id];
     final eMeta = _cardDataRepository[enemyCard.id];
 
     if (pMeta != null) {
       if (result == BattleResult.win) {
-        _applyEffects(pMeta.win, player, enemy, isWin: true);
+        _applyEffects(pMeta.win, player, enemy, isWin: true, isDelayedPhase: isDelayed);
       } else if (result == BattleResult.lose) {
-        _applyEffects(pMeta.lose, player, enemy, isWin: false);
+        _applyEffects(pMeta.lose, player, enemy, isWin: false, isDelayedPhase: isDelayed);
       }
     }
     if (eMeta != null) {
       if (result == BattleResult.lose) {
-        _applyEffects(eMeta.win, enemy, player, isWin: true);
+        _applyEffects(eMeta.win, enemy, player, isWin: true, isDelayedPhase: isDelayed);
       } else if (result == BattleResult.win) {
-        _applyEffects(eMeta.lose, enemy, player, isWin: false);
+        _applyEffects(eMeta.lose, enemy, player, isWin: false, isDelayedPhase: isDelayed);
       }
     }
   }
 
-  void _applyEffects(Map<String, int> effects, Player caster, Player target, {required bool isWin}) {
+  void _applyEffects(Map<String, int> effects, Player caster, Player target, {required bool isWin, required bool isDelayedPhase}) {
     if (effects.isEmpty) return;
 
-    effects.forEach((effectName, value) {
+    effects.forEach((effectKey, value) {
       if (value <= 0) return;
 
-      String displayEffect = effectName;
+      String cleanEffectName = effectKey.toLowerCase();
       
-      switch (effectName.toLowerCase()) {
-        case 'strength':
-          caster.addEffect(StatusEffect(type: EffectType.strength, value: value));
-          displayEffect = "Strength (+$value)";
-          break;
-        case 'shield':
-          caster.addEffect(StatusEffect(type: EffectType.shield, value: value));
-          displayEffect = "Shield (+$value)";
-          break;
-        case 'counter':
-          caster.addEffect(StatusEffect(type: EffectType.counter, value: value));
-          displayEffect = "Counter (+$value)";
-          break;
-        case 'immunity':
-          caster.addEffect(StatusEffect(type: EffectType.immunity, value: value));
-          displayEffect = "Immunity (Kebal) selama $value turn";
-          break;
-        case 'heal':
-          caster.hp = (caster.hp + value).clamp(0, caster.maxHp);
-          displayEffect = "Heal (+$value HP)";
-          break;
-        case 'dot':
-          target.addEffect(StatusEffect(type: EffectType.dot, value: value));
-          displayEffect = "DoT (+$value) ke ${target.name}";
-          break;
-        case 'damagereduce':
-        case 'weaken':
-          target.addEffect(StatusEffect(type: EffectType.damageReduce, value: value));
-          displayEffect = "Weaken selama $value turn ke ${target.name}";
-          break;
-        case 'vulnerable':
-          target.addEffect(StatusEffect(type: EffectType.vulnerable, value: value));
-          displayEffect = "Vulnerable selama $value turn ke ${target.name}";
-          break;
-        default:
-          target.addEffect(StatusEffect(type: EffectType.vulnerable, value: value));
-          displayEffect = "$effectName (+$value) ke ${target.name}";
-          break;
+      // Parse delay prefix at the beginning (e.g. delay_self_weaken)
+      bool hasDelayPrefix = false;
+      if (cleanEffectName.startsWith('delay_')) {
+        hasDelayPrefix = true;
+        cleanEffectName = cleanEffectName.substring(6);
+      }
+      
+      Player effectiveCaster = caster;
+      Player effectiveTarget = target;
+      Player intendedRecipient = caster; // Default recipient for buffs
+      bool hasTargetPrefix = false;
+
+      // Handle self_ / enemy_ / target_ prefix
+      if (cleanEffectName.startsWith('self_')) {
+        hasTargetPrefix = true;
+        cleanEffectName = cleanEffectName.substring(5);
+        effectiveCaster = caster;
+        effectiveTarget = caster;
+        intendedRecipient = caster;
+      } else if (cleanEffectName.startsWith('enemy_') || cleanEffectName.startsWith('target_')) {
+        hasTargetPrefix = true;
+        int prefixLen = cleanEffectName.startsWith('enemy_') ? 6 : 7;
+        cleanEffectName = cleanEffectName.substring(prefixLen);
+        effectiveCaster = target;
+        effectiveTarget = target;
+        intendedRecipient = target;
+      }
+
+      // Parse delay prefix again in case it was written as self_delay_weaken
+      if (cleanEffectName.startsWith('delay_')) {
+        hasDelayPrefix = true;
+        cleanEffectName = cleanEffectName.substring(6);
+        // Re-evaluate target prefix in case of delay_self_weaken
+        if (cleanEffectName.startsWith('self_')) {
+          hasTargetPrefix = true;
+          cleanEffectName = cleanEffectName.substring(5);
+          effectiveCaster = caster;
+          effectiveTarget = caster;
+          intendedRecipient = caster;
+        } else if (cleanEffectName.startsWith('enemy_') || cleanEffectName.startsWith('target_')) {
+          hasTargetPrefix = true;
+          int prefixLen = cleanEffectName.startsWith('enemy_') ? 6 : 7;
+          cleanEffectName = cleanEffectName.substring(prefixLen);
+          effectiveCaster = target;
+          effectiveTarget = target;
+          intendedRecipient = target;
+        }
+      }
+
+      if (!hasTargetPrefix) {
+        // Default mapping based on effect type
+        final isDebuff = cleanEffectName == 'dot' || 
+                         cleanEffectName == 'weaken' || 
+                         cleanEffectName == 'damagereduce' || 
+                         cleanEffectName == 'vulnerable';
+        intendedRecipient = isDebuff ? target : caster;
+      }
+
+      // Check if this effect timing matches the current phase
+      if (hasDelayPrefix != isDelayedPhase) {
+        return; // Skip this effect in the current phase
+      }
+
+      String displayEffect = cleanEffectName;
+      final behavior = BehaviorRegistry.getEffect(cleanEffectName);
+
+      if (behavior != null) {
+        displayEffect = behavior.apply(effectiveCaster, effectiveTarget, value);
+        // Append recipient name for buffs if prefix was used to override
+        if (hasTargetPrefix) {
+          final isBuff = cleanEffectName != 'dot' && 
+                         cleanEffectName != 'weaken' && 
+                         cleanEffectName != 'damagereduce' && 
+                         cleanEffectName != 'vulnerable';
+          if (isBuff) {
+            displayEffect = "$displayEffect ke ${intendedRecipient.name}";
+          }
+        }
+      } else {
+        // Fallback for custom or unrecognized effects
+        effectiveTarget.addEffect(StatusEffect(type: EffectType.vulnerable, value: value));
+        displayEffect = "$cleanEffectName (+$value) ke ${effectiveTarget.name}";
       }
 
       final String actionStr = isWin ? "MENANG" : "KALAH";
-      battleLog += "\n✨ [Ability] $actionStr: ${caster.name} memicu $displayEffect.";
+      final String delayStr = isDelayedPhase ? " [Turn Depan]" : " [Instan]";
+      battleLog += "\n✨ [Ability]$delayStr $actionStr: ${caster.name} memicu $displayEffect.";
     });
   }
 
