@@ -38,12 +38,15 @@ class _CustomTooltipOverlayState extends State<CustomTooltipOverlay> {
           targetAnchor: widget.targetAnchor,
           followerAnchor: widget.followerAnchor,
           offset: widget.offset,
-          child: Material(
-            color: Colors.transparent,
-            child: widget.tooltipContent
-              .animate()
-              .fadeIn(duration: 120.ms)
-              .moveY(begin: 2, end: 0, duration: 120.ms),
+          child: UnconstrainedBox(
+            alignment: widget.followerAnchor,
+            child: Material(
+              color: Colors.transparent,
+              child: widget.tooltipContent
+                .animate()
+                .fadeIn(duration: 120.ms)
+                .moveY(begin: 2, end: 0, duration: 120.ms),
+            ),
           ),
         );
       },

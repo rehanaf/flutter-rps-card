@@ -42,7 +42,7 @@ class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     return AppBar(
-      backgroundColor: const Color(0xFF141416),
+      backgroundColor: Colors.transparent,
       foregroundColor: const Color(0xFFC5A059),
       automaticallyImplyLeading: showBackButton,
       elevation: 0,
@@ -85,7 +85,7 @@ class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
               const Icon(Icons.monetization_on_rounded, color: Colors.amber, size: 18),
               const SizedBox(width: 6),
               Text(
-                '${playerRun.gold}G',
+                '${playerRun.gold}',
                 style: const TextStyle(
                   fontWeight: FontWeight.w900,
                   fontSize: 14,

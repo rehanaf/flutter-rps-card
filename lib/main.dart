@@ -15,6 +15,10 @@ import 'services/settings_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Sembunyikan status bar dan bar navigasi bawaan dengan immersiveSticky
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
@@ -36,7 +40,7 @@ class MyApp extends StatelessWidget {
       child: Consumer<SettingsProvider>(
         builder: (context, settingsProvider, child) {
           return MaterialApp(
-            title: 'RPS Card Game',
+            title: 'RPS Deck',
             debugShowCheckedModeBanner: false,
             locale: settingsProvider.locale,
         

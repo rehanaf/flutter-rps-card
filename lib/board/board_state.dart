@@ -43,7 +43,7 @@ class BoardState extends ChangeNotifier {
       previewPlayerCard = card;
       final double cardWidth = screenSize.width * 0.1;
       cardX = screenSize.width * 0.40 - (cardWidth / 2);
-      final double bodyHeight = screenSize.height - 56.0;
+      final double bodyHeight = screenSize.height;
       cardY = (bodyHeight / 2) - (cardWidth * 0.7);
     } else {
       previewPlayerCard = null;
@@ -331,7 +331,7 @@ class BoardState extends ChangeNotifier {
     
     // Set koordinat secara instan ke meja (karena sudah menempel rapi saat pratinjau)
     cardX = screenSize.width * 0.40 - (cardWidth / 2);
-    final double bodyHeight = screenSize.height - 56.0;
+    final double bodyHeight = screenSize.height;
     cardY = (bodyHeight / 2) - (cardWidth * 0.7);
     isAnimating = false; // Tidak memerlukan animasi geser lagi
 
@@ -478,8 +478,8 @@ class BoardState extends ChangeNotifier {
         Future.delayed(const Duration(milliseconds: 30), () {
           enemyCardX = screenSize.width * 0.60 - (cardWidth / 2);
           
-          // Posisi vertikal tengah-tengah body Scaffold (dikurangi tinggi AppBar 56.0)
-          final double bodyHeight = screenSize.height - 56.0;
+          // Posisi vertikal tengah-tengah body Scaffold
+          final double bodyHeight = screenSize.height;
           enemyCardY = (bodyHeight / 2) - (cardWidth * 0.7);
           notifyListeners();
         });

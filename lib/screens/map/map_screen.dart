@@ -151,6 +151,7 @@ class MapScreen extends StatelessWidget {
     ];
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: const GameAppBar(showBackButton: false),
       body: Container(
         decoration: const BoxDecoration(

@@ -29,6 +29,7 @@ class GameplayScreen extends StatelessWidget {
     final double cardWidth = screenSize.width * 0.1;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: const GameAppBar(showBackButton: false),
       body: Container(
         decoration: const BoxDecoration(
@@ -69,91 +70,15 @@ class GameplayScreen extends StatelessWidget {
             // LAYER 3.5: PLAYER SYNERGIES BAR (FLOATING AT THE TOP, BELOW APPBAR)
             _buildTopSynergiesBar(context, boardState),
 
-            // KARAKTER PLAYER (SLAY THE SPIRE STYLE)
-            Positioned(
-              left: screenSize.width * 0.08,
-              bottom: screenSize.height * 0.32 + 20 - (cardWidth / 2),
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTapDown: (details) {
-                  boardState.setHoveredCardIndex(null);
-                  final pos = details.globalPosition;
-                  boardState.updateActiveGesture("TAP_PLAYER_CHAR", x: pos.dx, y: pos.dy);
-                  boardState.addGestureLog("Player Character onTapDown at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)}) - Clear Zoom");
-                },
-                child: CharacterDisplayWidget(
-                  isPlayer: true,
-                  width: screenSize.width * 0.22,
-                  height: screenSize.height * 0.28,
-                ),
-              ),
-            ),
-
-            // KARAKTER MUSUH (SLAY THE SPIRE STYLE)
-            Positioned(
-              right: screenSize.width * 0.08,
-              bottom: screenSize.height * 0.32 + 20 - (cardWidth / 2),
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTapDown: (details) {
-                  boardState.setHoveredCardIndex(null);
-                  final pos = details.globalPosition;
-                  boardState.updateActiveGesture("TAP_ENEMY_CHAR", x: pos.dx, y: pos.dy);
-                  boardState.addGestureLog("Enemy Character onTapDown at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)}) - Clear Zoom");
-                },
-                child: CharacterDisplayWidget(
-                  isPlayer: false,
-                  width: screenSize.width * 0.22,
-                  height: screenSize.height * 0.28,
-                ),
-              ),
-            ),
-
-
-
-
-
-            // KARTU MUSUH DI MEJA (LAYER 4)
-            if (boardState.enemyCardOnTable != null)
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.easeOutBack,
-                left: boardState.enemyCardX,
-                top: boardState.enemyCardY,
-                child: GameCardWidget(
-                  card: boardState.enemyCardOnTable!,
-                  isPlayerCard: false,
-                  width: cardWidth,
-                ),
-              ),
-
-            // KARTU PLAYER DI MEJA (LAYER 5)
-            if (boardState.playerCardOnTable != null)
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.easeOutBack,
-                left: boardState.cardX,
-                top: boardState.cardY,
-                onEnd: () => boardState.onAnimationGlideComplete(screenSize),
-                child: GameCardWidget(
-                  card: boardState.playerCardOnTable!,
-                  isPlayerCard: true,
-                  width: cardWidth,
-                ),
-              ),
-
-            // DRAG TARGET SENSOR MEJA ARENA
+            // LAYER 3.7: DRAG TARGET SENSOR MEJA ARENA (Di belakang karakter agar status efek & karakter bisa di-hover!)
             // ========================================================
-            // FIXED: SENSOR DRAG TARGET DROP AREA (MEJA TENGAH)
-            // ========================================================
-            // ========================================================
-            // LAYER 6: SENSOR DRAG TARGET DROP AREA (MEJA TENGAH BESAR)
+            // SENSOR DRAG TARGET DROP AREA (MEJA TENGAH BESAR)
             // ========================================================
             if (boardState.playerCardOnTable == null)
               Positioned(
                 left: 16,
                 right: 16,
-                top: 76,
+                top: kToolbarHeight + MediaQuery.of(context).padding.top + 72,
                 bottom: screenSize.height * 0.32 + 8 - (cardWidth / 2),
                 child: DragTarget<Object>(
                   onWillAcceptWithDetails: (details) {
@@ -223,8 +148,8 @@ class GameplayScreen extends StatelessWidget {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: isHighlighted
-                                    ? const Color(0xFFC5A059)
-                                    : Colors.white24,
+                                      ? const Color(0xFFC5A059)
+                                      : Colors.white24,
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 0.5,
@@ -253,6 +178,81 @@ class GameplayScreen extends StatelessWidget {
                   },
                 ),
               ),
+
+            // KARAKTER PLAYER (SLAY THE SPIRE STYLE)
+            Positioned(
+              left: screenSize.width * 0.08,
+              bottom: (screenSize.height * 0.32 + 8 - (cardWidth / 2)) - 36,
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTapDown: (details) {
+                  boardState.setHoveredCardIndex(null);
+                  final pos = details.globalPosition;
+                  boardState.updateActiveGesture("TAP_PLAYER_CHAR", x: pos.dx, y: pos.dy);
+                  boardState.addGestureLog("Player Character onTapDown at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)}) - Clear Zoom");
+                },
+                child: CharacterDisplayWidget(
+                  isPlayer: true,
+                  width: screenSize.width * 0.22,
+                  height: screenSize.height * 0.28,
+                ),
+              ),
+            ),
+
+            // KARAKTER MUSUH (SLAY THE SPIRE STYLE)
+            Positioned(
+              right: screenSize.width * 0.08,
+              bottom: (screenSize.height * 0.32 + 8 - (cardWidth / 2)) - 36,
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTapDown: (details) {
+                  boardState.setHoveredCardIndex(null);
+                  final pos = details.globalPosition;
+                  boardState.updateActiveGesture("TAP_ENEMY_CHAR", x: pos.dx, y: pos.dy);
+                  boardState.addGestureLog("Enemy Character onTapDown at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)}) - Clear Zoom");
+                },
+                child: CharacterDisplayWidget(
+                  isPlayer: false,
+                  width: screenSize.width * 0.22,
+                  height: screenSize.height * 0.28,
+                ),
+              ),
+            ),
+
+
+
+
+
+            // KARTU MUSUH DI MEJA (LAYER 4)
+            if (boardState.enemyCardOnTable != null)
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeOutBack,
+                left: boardState.enemyCardX,
+                top: boardState.enemyCardY,
+                child: GameCardWidget(
+                  card: boardState.enemyCardOnTable!,
+                  isPlayerCard: false,
+                  width: cardWidth,
+                ),
+              ),
+
+            // KARTU PLAYER DI MEJA (LAYER 5)
+            if (boardState.playerCardOnTable != null)
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeOutBack,
+                left: boardState.cardX,
+                top: boardState.cardY,
+                onEnd: () => boardState.onAnimationGlideComplete(screenSize),
+                child: GameCardWidget(
+                  card: boardState.playerCardOnTable!,
+                  isPlayerCard: true,
+                  width: cardWidth,
+                ),
+              ),
+
+            // (DragTarget repositioned to Layer 3.7 behind characters)
 
 
             // IKON DISCARD PILE (KANAN BAWAH)
@@ -742,8 +742,10 @@ class GameplayScreen extends StatelessWidget {
 
     if (activeSynergyEntries.isEmpty) return const SizedBox.shrink();
 
+    final double appBarHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
+
     return Positioned(
-      top: 12,
+      top: appBarHeight + 8,
       left: 0,
       right: 0,
       child: Center(
@@ -789,6 +791,9 @@ class GameplayScreen extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 4.0),
                   child: CustomTooltipOverlay(
+                    targetAnchor: Alignment.bottomCenter,
+                    followerAnchor: Alignment.topCenter,
+                    offset: const Offset(0, 6),
                     tooltipContent: _buildTooltipBubble("Synergy: ${syn.toUpperCase()}", explanation, syncColor),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
@@ -842,21 +847,44 @@ class GameplayScreen extends StatelessWidget {
 
   Widget _buildTooltipBubble(String title, String description, Color color) {
     return Container(
-      padding: const EdgeInsets.all(8),
-      width: 150,
+      padding: const EdgeInsets.all(10),
+      constraints: const BoxConstraints(
+        minWidth: 120,
+        maxWidth: 180,
+      ),
       decoration: BoxDecoration(
         color: const Color(0xEC1E1E1E),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color, width: 1.0),
-        boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 4, offset: Offset(0, 2))],
+        border: Border.all(color: color, width: 1.2),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black54,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(title, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 4),
-          Text(description, style: const TextStyle(color: Colors.white70, fontSize: 9, height: 1.2)),
+          Text(
+            title,
+            style: TextStyle(
+              color: color,
+              fontSize: 10.5,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            description,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 9.5,
+              height: 1.3,
+            ),
+          ),
         ],
       ),
     );

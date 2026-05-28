@@ -5,6 +5,7 @@ import '../../../board/board_state.dart';
 import '../../../utils/tooltip_helper.dart';
 import '../../../components/custom_tooltip_overlay.dart';
 import '../../../models/status_effect.dart';
+import '../../../services/app_localizations.dart';
 
 class _EffectAnimInfo {
   final IconData icon;
@@ -124,6 +125,51 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget> {
         ? 'assets/images/characters/default_player.png'
         : 'assets/images/characters/default_enemy.png';
 
+    Widget buildTooltipBubble(String title, String description, Color color) {
+      return Container(
+        padding: const EdgeInsets.all(10),
+        constraints: const BoxConstraints(
+          minWidth: 120,
+          maxWidth: 180,
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xEC1E1E1E),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: color, width: 1.2),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black54,
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                color: color,
+                fontSize: 10.5,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              description,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 9.5,
+                height: 1.3,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     // ANIMATION STATE DETERMINATION (ATTACK & HIT TRIGGERS)
     final activeOverlay = boardState.activeOverlay;
     String animState = 'idle';
@@ -144,44 +190,67 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget> {
         final sectorIcon = boardState.enemyIntentSectorIcon;
         final color = boardState.enemyIntentColor;
 
-        intentBubble = Container(
-          margin: const EdgeInsets.only(bottom: 6),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: const Color(0xEC1E1E1E),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Colors.white24,
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.4),
-                blurRadius: 6,
-                spreadRadius: 1,
+        final int val = int.tryParse(nextCard.id) ?? 0;
+        String sectorName = "";
+        if (val <= 33) {
+          sectorName = "Low (1-33)";
+        } else if (val <= 67) {
+          sectorName = "Mid (34-67)";
+        } else {
+          sectorName = "High (68-101)";
+        }
+
+        final localization = AppLocalizations.of(context);
+        final cardMeta = localization?.getCardMetadata(nextCard.id);
+        final synergy = cardMeta?.synergy ?? "Basic";
+
+        final String intentTitle = "Niat Musuh: ${synergy.toUpperCase()}";
+        final String intentDesc = "Musuh akan memainkan kartu sinergi $synergy di sektor roda $sectorName.";
+
+        intentBubble = CustomTooltipOverlay(
+          targetAnchor: Alignment.bottomCenter,
+          followerAnchor: Alignment.topCenter,
+          offset: const Offset(0, 6),
+          tooltipContent: buildTooltipBubble(intentTitle, intentDesc, color),
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xEC1E1E1E),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white24,
+                width: 1.5,
               ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (boardState.enemyIntentText != null) ...[
-                Icon(icon, color: color, size: 16),
-                const SizedBox(width: 2),
-                Icon(sectorIcon, color: Colors.white70, size: 16),
-              ] else ...[
-                Icon(icon, color: color, size: 16),
-                const SizedBox(width: 6),
-                const Text(
-                  "Bersiap...",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.4),
+                  blurRadius: 6,
+                  spreadRadius: 1,
                 ),
               ],
-            ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (boardState.enemyIntentText != null) ...[
+                  Icon(icon, color: color, size: 16),
+                  const SizedBox(width: 2),
+                  Icon(sectorIcon, color: Colors.white70, size: 16),
+                ] else ...[
+                  Icon(icon, color: color, size: 16),
+                  const SizedBox(width: 6),
+                  const Text(
+                    "Bersiap...",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
         )
         .animate(onPlay: (controller) => controller.repeat(reverse: true))
@@ -348,27 +417,7 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget> {
       },
     );
 
-    Widget buildTooltipBubble(String title, String description, Color color) {
-      return Container(
-        padding: const EdgeInsets.all(8),
-        width: 150,
-        decoration: BoxDecoration(
-          color: const Color(0xEC1E1E1E),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color, width: 1.0),
-          boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 4, offset: Offset(0, 2))],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(title, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            Text(description, style: const TextStyle(color: Colors.white70, fontSize: 9, height: 1.2)),
-          ],
-        ),
-      );
-    }
+
 
     Widget buildStatusEffectsList() {
       final activeEffects = activePlayer.activeEffects

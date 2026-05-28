@@ -158,6 +158,7 @@ class _ShopScreenState extends State<ShopScreen> {
     final Size screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: const GameAppBar(showBackButton: true),
       body: Container(
         decoration: const BoxDecoration(

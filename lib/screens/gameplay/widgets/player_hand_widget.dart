@@ -78,7 +78,7 @@ class _PlayerHandWidgetState extends State<PlayerHandWidget> {
         finalOpacity = 0.2;
       } else if (isSnappedToTable) {
         finalTranslateX = -widget.screenSize.width * 0.10;
-        finalTranslateY = -((widget.screenSize.height - 56.0) * 0.50 - cardHeight / 2);
+        finalTranslateY = -(widget.screenSize.height * 0.50 - cardHeight / 2);
         finalRotation = 0.0;
         finalScale = 1.0;
         finalOpacity = 1.0;
