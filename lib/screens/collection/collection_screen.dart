@@ -45,79 +45,97 @@ class _CollectionScreenState extends State<CollectionScreen> {
       return meta.synergy.toLowerCase() == _selectedSynergy.toLowerCase();
     }).toList();
     return Scaffold(
-      body: Container(
-        // Latar belakang gradasi gelap yang senada dengan arena gameplay
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF1F1F1F), Color(0xFF0A0A0A)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Column(
-              children: [
-                // 1. Bagian Atas: Header Informasi Deck
-                CollectionHeader(
-                  totalCards: allCards.length,
-                  titleText: localization.getUiText('collectionTitle'),
-                ),
-                
-                const SizedBox(height: 15),
-                
-                // Filter Tab Sinergi
-                SizedBox(
-                  height: 40,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _synergies.length,
-                    itemBuilder: (context, index) {
-                      final synergy = _synergies[index];
-                      final isSelected = _selectedSynergy == synergy;
-                      return Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: ChoiceChip(
-                          label: Text(
-                            synergy,
-                            style: TextStyle(
-                              color: isSelected ? Colors.black : Colors.white70,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                              fontSize: 12,
-                            ),
-                          ),
-                          selected: isSelected,
-                          selectedColor: const Color(0xFFC5A059),
-                          backgroundColor: const Color(0x33C5A059),
-                          side: BorderSide(
-                            color: isSelected ? Colors.transparent : const Color(0x66C5A059),
-                          ),
-                          onSelected: (selected) {
-                            if (selected) {
-                              setState(() {
-                                _selectedSynergy = synergy;
-                              });
-                            }
-                          },
-                        ),
-                      );
-                    },
+      body: Stack(
+        children: [
+          // Wallpaper Background dengan overlay gelap
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/background/collection.jpg',
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF1F1F1F), Color(0xFF0A0A0A)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
                   ),
-                ),
-
-                const SizedBox(height: 15),
-                const Divider(color: Colors.white12, height: 1),
-                const SizedBox(height: 10),
-                
-                // 2. Bagian Bawah: Grid Daftar Kartu Milik Pemain
-                Expanded(
-                  child: CollectionGrid(masterDeck: currentDeck),
-                ),
-              ],
+                );
+              },
             ),
           ),
-        ),
+          Positioned.fill(
+            child: Container(color: Colors.black.withValues(alpha: 0.65)),
+          ),
+
+          // Konten Utama
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 1. Bagian Atas: Header Informasi Deck
+                  CollectionHeader(
+                    totalCards: allCards.length,
+                    titleText: localization.getUiText('collectionTitle'),
+                  ),
+                  
+                  const SizedBox(height: 15),
+                  
+                  // Filter Tab Sinergi
+                  SizedBox(
+                    height: 40,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _synergies.length,
+                      itemBuilder: (context, index) {
+                        final synergy = _synergies[index];
+                        final isSelected = _selectedSynergy == synergy;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: ChoiceChip(
+                            label: Text(
+                              synergy,
+                              style: TextStyle(
+                                color: isSelected ? Colors.black : Colors.white70,
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                fontSize: 12,
+                              ),
+                            ),
+                            selected: isSelected,
+                            selectedColor: const Color(0xFFC5A059),
+                            backgroundColor: const Color(0x33C5A059),
+                            side: BorderSide(
+                              color: isSelected ? Colors.transparent : const Color(0x66C5A059),
+                            ),
+                            onSelected: (selected) {
+                              if (selected) {
+                                setState(() {
+                                  _selectedSynergy = synergy;
+                                });
+                              }
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 15),
+                  const Divider(color: Colors.white12, height: 1),
+                  const SizedBox(height: 10),
+                  
+                  // 2. Bagian Bawah: Grid Daftar Kartu Milik Pemain
+                  Expanded(
+                    child: CollectionGrid(masterDeck: currentDeck),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
             locale: settingsProvider.locale,
         
         // ==========================================
-        // TEMA UTAMA & FONT OUTFIT GLOBAL
+        // TEMA UTAMA & FONT GLOBAL
         // ==========================================
         theme: ThemeData(
           useMaterial3: true,

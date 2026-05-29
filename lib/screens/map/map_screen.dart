@@ -45,7 +45,7 @@ class MapScreen extends StatelessWidget {
       MapNodeData(
         id: 'node_1',
         type: 'BATTLE',
-        enemyId: 'e_toxic_slime',
+        enemyId: 'e_toxic_wizard',
         floor: 1,
         x: 60,
         y: 150,
@@ -56,7 +56,7 @@ class MapScreen extends StatelessWidget {
       MapNodeData(
         id: 'node_2_1',
         type: 'BATTLE',
-        enemyId: 'e_cyber_scout',
+        enemyId: 'e_robot_crow',
         floor: 2,
         x: 180,
         y: 90,
@@ -65,7 +65,7 @@ class MapScreen extends StatelessWidget {
       MapNodeData(
         id: 'node_2_2',
         type: 'BATTLE',
-        enemyId: 'e_wind_ranger',
+        enemyId: 'e_air_assasin',
         floor: 2,
         x: 180,
         y: 210,
@@ -76,7 +76,7 @@ class MapScreen extends StatelessWidget {
       MapNodeData(
         id: 'node_3_1',
         type: 'BATTLE',
-        enemyId: 'e_fire_mage',
+        enemyId: 'e_fire_golem',
         floor: 3,
         x: 300,
         y: 50,
@@ -93,7 +93,7 @@ class MapScreen extends StatelessWidget {
       MapNodeData(
         id: 'node_3_3',
         type: 'BATTLE',
-        enemyId: 'e_stone_golem',
+        enemyId: 'e_ancient_warrior',
         floor: 3,
         x: 300,
         y: 250,
@@ -104,7 +104,7 @@ class MapScreen extends StatelessWidget {
       MapNodeData(
         id: 'node_4_1',
         type: 'BATTLE',
-        enemyId: 'e_cosmic_spectre',
+        enemyId: 'e_cosmic_assasin',
         floor: 4,
         x: 420,
         y: 90,
@@ -113,7 +113,7 @@ class MapScreen extends StatelessWidget {
       MapNodeData(
         id: 'node_4_2',
         type: 'BATTLE',
-        enemyId: 'e_stone_golem',
+        enemyId: 'e_ancient_warrior',
         floor: 4,
         x: 420,
         y: 210,
@@ -142,7 +142,7 @@ class MapScreen extends StatelessWidget {
       MapNodeData(
         id: 'node_6',
         type: 'BOSS',
-        enemyId: 'e_boss_ancient_golem',
+        enemyId: 'e_boss_skeleton',
         floor: 6,
         x: 660,
         y: 150,
@@ -153,66 +153,84 @@ class MapScreen extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: const GameAppBar(showBackButton: false),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF141414), Color(0xFF0F0F0F)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: SizedBox(
-              width: 720,
-              height: 320,
-              child: Stack(
-                children: [
-                  // 1. GAMBAR GARIS KONEKSI CABANG (CustomPaint)
-                  Positioned.fill(
-                    child: CustomPaint(
-                      painter: MapConnectionsPainter(
-                        nodes: mapNodes,
-                        completedNodeIds: playerRun.completedNodeIds,
-                        lastCompletedNodeId: playerRun.lastCompletedNodeId,
-                        currentFloor: playerRun.currentFloor,
-                      ),
+      body: Stack(
+        children: [
+          // Wallpaper Background dengan overlay gelap
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/background/default.jpg',
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF141414), Color(0xFF0F0F0F)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
                     ),
                   ),
+                );
+              },
+            ),
+          ),
+          Positioned.fill(
+            child: Container(color: Colors.black.withValues(alpha: 0.75)),
+          ),
 
-                  // 2. RENDERING TOMBOL-TOMBOL NODE
-                  ...mapNodes.map((node) {
-                    final bool isCompleted = playerRun.completedNodeIds.contains(node.id);
-                    
-                    // Node aktif dicek dari: lantai aktif pemain DAN memiliki relasi parent dengan node terakhir yang diselesaikan
-                    final bool isCurrent = node.floor == playerRun.currentFloor &&
-                        (node.parentIds.isEmpty || node.parentIds.contains(playerRun.lastCompletedNodeId));
-                    
-                    final bool isLocked = !isCompleted && !isCurrent;
-
-                    return Positioned(
-                      left: node.x - 34, // Centered (width 68)
-                      top: node.y - 34,  // Centered (height 68)
-                      child: _buildMapNodeButton(
-                        context,
-                        node: node,
-                        isCurrent: isCurrent,
-                        isCompleted: isCompleted,
-                        isLocked: isLocked,
-                        localization: localization,
-                        screenSize: screenSize,
-                        playerRun: playerRun,
+          // Konten Utama
+          Center(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: SizedBox(
+                width: 720,
+                height: 320,
+                child: Stack(
+                  children: [
+                    // 1. GAMBAR GARIS KONEKSI CABANG (CustomPaint)
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: MapConnectionsPainter(
+                          nodes: mapNodes,
+                          completedNodeIds: playerRun.completedNodeIds,
+                          lastCompletedNodeId: playerRun.lastCompletedNodeId,
+                          currentFloor: playerRun.currentFloor,
+                        ),
                       ),
-                    );
-                  }),
-                ],
+                    ),
+
+                    // 2. RENDERING TOMBOL-TOMBOL NODE
+                    ...mapNodes.map((node) {
+                      final bool isCompleted = playerRun.completedNodeIds.contains(node.id);
+                      
+                      // Node aktif dicek dari: lantai aktif pemain DAN memiliki relasi parent dengan node terakhir yang diselesaikan
+                      final bool isCurrent = node.floor == playerRun.currentFloor &&
+                          (node.parentIds.isEmpty || node.parentIds.contains(playerRun.lastCompletedNodeId));
+                      
+                      final bool isLocked = !isCompleted && !isCurrent;
+
+                      return Positioned(
+                        left: node.x - 34, // Centered (width 68)
+                        top: node.y - 34,  // Centered (height 68)
+                        child: _buildMapNodeButton(
+                          context,
+                          node: node,
+                          isCurrent: isCurrent,
+                          isCompleted: isCompleted,
+                          isLocked: isLocked,
+                          localization: localization,
+                          screenSize: screenSize,
+                          playerRun: playerRun,
+                        ),
+                      );
+                    }),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -309,19 +327,11 @@ class MapScreen extends StatelessWidget {
         allCards: localization.allCardsMetadata,
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Masuk ke arena pertempuran melawan: ${enemyMeta.name}!')),
-      );
-      
       Navigator.pushNamed(context, GameplayScreen.routeName);
       
     } else if (node.type == 'SHOP') {
       // Buka Shop Screen interaktif
       playerRun.selectedNodeId = node.id;
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Mengunjungi Merchant Tenda Pedagang...')),
-      );
 
       Navigator.pushNamed(context, ShopScreen.routeName);
     }

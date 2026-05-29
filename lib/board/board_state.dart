@@ -100,6 +100,7 @@ class BoardState extends ChangeNotifier {
 
   late Player player;
   late Player enemy;
+  EnemyMetadata? activeEnemyMeta;
 
   int initialDrawCount = 3;
   int turnDrawCount = 3;
@@ -142,6 +143,8 @@ class BoardState extends ChangeNotifier {
   }) {
     _cardDataRepository = allCards;
 
+    activeEnemyMeta = enemyMeta;
+
     player = Player(name: "Player", isEnemy: false)
       ..hp = playerRun.currentHp
       ..maxHp = playerRun.maxHp;
@@ -152,6 +155,7 @@ class BoardState extends ChangeNotifier {
     enemy = Player(name: enemyMeta.name, isEnemy: true)
       ..hp = enemyMeta.baseHp
       ..maxHp = enemyMeta.baseHp;
+
 
     _generateEnemyArchetypeDeck(enemyMeta, allCards);
 
@@ -467,9 +471,9 @@ class BoardState extends ChangeNotifier {
       battleLog = "Musuh mengeluarkan kartu tandingan! Mengalkulasi hasil...";
       isBattleCalculated = true;
 
-      // Mulai animasi meluncur dari pojok kanan bawah (Y diatur ke 0.6 dari tinggi layar)
-      enemyCardX = screenSize.width;
-      enemyCardY = screenSize.height * 0.6;
+      // Mulai animasi meluncur dari bagian atas layar (di luar batas atas)
+      enemyCardX = screenSize.width * 0.60 - (cardWidth / 2);
+      enemyCardY = -(cardWidth * 1.5);
       isEnemyAnimating = true;
       notifyListeners();
 

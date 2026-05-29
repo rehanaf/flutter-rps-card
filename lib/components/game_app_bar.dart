@@ -375,10 +375,9 @@ class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
             insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
-                const double dialogWidth = 460;
-
                 return Container(
-                  width: dialogWidth,
+                  constraints: const BoxConstraints(maxWidth: 460),
+                  width: double.infinity,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     color: const Color(0xFA1E1E1E),
@@ -392,162 +391,165 @@ class GameAppBar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                     ],
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.settings_rounded,
-                            color: Color(0xFFC5A059),
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            localization.getUiText('settingsTitle').toUpperCase(),
-                            style: const TextStyle(
-                              color: Color(0xFFC5A059),
-                              fontSize: 22,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 2,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      const Divider(color: Color(0x33C5A059), thickness: 1.5),
-                      const SizedBox(height: 16),
-
-                      _buildSettingRow(
-                        icon: Icons.music_note_rounded,
-                        title: localization.locale.languageCode == 'id' ? 'Musik Latar' : 'Background Music',
-                        control: Switch(
-                          value: tempMusic,
-                          activeThumbColor: const Color(0xFFC5A059),
-                          activeTrackColor: const Color(0x4DC5A059),
-                          inactiveThumbColor: Colors.grey,
-                          inactiveTrackColor: Colors.black26,
-                          onChanged: (val) {
-                            setState(() {
-                              tempMusic = val;
-                            });
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      _buildSettingRow(
-                        icon: Icons.volume_up_rounded,
-                        title: localization.locale.languageCode == 'id' ? 'Efek Suara' : 'Sound Effects',
-                        control: Switch(
-                          value: tempSfx,
-                          activeThumbColor: const Color(0xFFC5A059),
-                          activeTrackColor: const Color(0x4DC5A059),
-                          inactiveThumbColor: Colors.grey,
-                          inactiveTrackColor: Colors.black26,
-                          onChanged: (val) {
-                            setState(() {
-                              tempSfx = val;
-                            });
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      _buildSettingRow(
-                        icon: Icons.language_rounded,
-                        title: localization.locale.languageCode == 'id' ? 'Bahasa' : 'Language',
-                        control: Row(
-                          mainAxisSize: MainAxisSize.min,
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _buildLanguageOption(
-                              label: "ID",
-                              isSelected: tempLocale.languageCode == 'id',
-                              onTap: () {
-                                setState(() {
-                                  tempLocale = const Locale('id');
-                                });
-                              },
+                            const Icon(
+                              Icons.settings_rounded,
+                              color: Color(0xFFC5A059),
+                              size: 28,
                             ),
-                            const SizedBox(width: 8),
-                            _buildLanguageOption(
-                              label: "EN",
-                              isSelected: tempLocale.languageCode == 'en',
-                              onTap: () {
-                                setState(() {
-                                  tempLocale = const Locale('en');
-                                });
-                              },
+                            const SizedBox(width: 10),
+                            Text(
+                              localization.getUiText('settingsTitle').toUpperCase(),
+                              style: const TextStyle(
+                                color: Color(0xFFC5A059),
+                                fontSize: 22,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 2,
+                              ),
                             ),
                           ],
                         ),
-                      ),
+                        const SizedBox(height: 8),
+                        const Divider(color: Color(0x33C5A059), thickness: 1.5),
+                        const SizedBox(height: 16),
 
-                      const SizedBox(height: 20),
-                      const Divider(color: Color(0x1AC5A059), thickness: 1.5),
-                      const SizedBox(height: 12),
-
-                      Text(
-                        localization.locale.languageCode == 'id'
-                            ? "VERSI 1.0.0 • DIKEMBANGKAN OLEH ANTIGRAVITY"
-                            : "VERSION 1.0.0 • DEVELOPED BY ANTIGRAVITY",
-                        style: const TextStyle(
-                          color: Colors.white30,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.white70,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              localization.getUiText('cancelButton').toUpperCase(),
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.0,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFC5A059),
-                              foregroundColor: const Color(0xFF1E1E1E),
-                              elevation: 3,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                            ),
-                            onPressed: () {
-                              settingsProvider.setMusic(tempMusic);
-                              settingsProvider.setSfx(tempSfx);
-                              settingsProvider.setLocale(tempLocale);
-                              Navigator.pop(context);
+                        _buildSettingRow(
+                          icon: Icons.music_note_rounded,
+                          title: localization.locale.languageCode == 'id' ? 'Musik Latar' : 'Background Music',
+                          control: Switch(
+                            value: tempMusic,
+                            activeThumbColor: const Color(0xFFC5A059),
+                            activeTrackColor: const Color(0x4DC5A059),
+                            inactiveThumbColor: Colors.grey,
+                            inactiveTrackColor: Colors.black26,
+                            onChanged: (val) {
+                              setState(() {
+                                tempMusic = val;
+                              });
                             },
-                            child: Text(
-                              localization.getUiText('saveButton').toUpperCase(),
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 1.0,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        _buildSettingRow(
+                          icon: Icons.volume_up_rounded,
+                          title: localization.locale.languageCode == 'id' ? 'Efek Suara' : 'Sound Effects',
+                          control: Switch(
+                            value: tempSfx,
+                            activeThumbColor: const Color(0xFFC5A059),
+                            activeTrackColor: const Color(0x4DC5A059),
+                            inactiveThumbColor: Colors.grey,
+                            inactiveTrackColor: Colors.black26,
+                            onChanged: (val) {
+                              setState(() {
+                                tempSfx = val;
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        _buildSettingRow(
+                          icon: Icons.language_rounded,
+                          title: localization.locale.languageCode == 'id' ? 'Bahasa' : 'Language',
+                          control: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildLanguageOption(
+                                label: "ID",
+                                isSelected: tempLocale.languageCode == 'id',
+                                onTap: () {
+                                  setState(() {
+                                    tempLocale = const Locale('id');
+                                  });
+                                },
+                              ),
+                              const SizedBox(width: 8),
+                              _buildLanguageOption(
+                                label: "EN",
+                                isSelected: tempLocale.languageCode == 'en',
+                                onTap: () {
+                                  setState(() {
+                                    tempLocale = const Locale('en');
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+                        const Divider(color: Color(0x1AC5A059), thickness: 1.5),
+                        const SizedBox(height: 12),
+
+                        Text(
+                          localization.locale.languageCode == 'id'
+                              ? "VERSI 1.0.0 • DIKEMBANGKAN OLEH ANTIGRAVITY"
+                              : "VERSION 1.0.0 • DEVELOPED BY ANTIGRAVITY",
+                          style: const TextStyle(
+                            color: Colors.white30,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.white70,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(
+                                localization.getUiText('cancelButton').toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.0,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            const SizedBox(width: 12),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFC5A059),
+                                foregroundColor: const Color(0xFF1E1E1E),
+                                elevation: 3,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              ),
+                              onPressed: () {
+                                settingsProvider.setMusic(tempMusic);
+                                settingsProvider.setSfx(tempSfx);
+                                settingsProvider.setLocale(tempLocale);
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                localization.getUiText('saveButton').toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },

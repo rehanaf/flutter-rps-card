@@ -7,6 +7,7 @@ import '../../../components/custom_tooltip_overlay.dart';
 import '../../../models/status_effect.dart';
 import '../../../services/app_localizations.dart';
 
+
 class _EffectAnimInfo {
   final IconData icon;
   final Color color;
@@ -121,9 +122,27 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget> {
     final boardState = context.watch<BoardState>();
     final activePlayer = widget.isPlayer ? boardState.player : boardState.enemy;
 
-    final String assetPath = widget.isPlayer
-        ? 'assets/images/characters/default_player.png'
-        : 'assets/images/characters/default_enemy.png';
+    String assetPath = 'assets/images/characters/default.png';
+    if (widget.isPlayer) {
+      assetPath = 'assets/images/characters/player.png';
+    } else {
+      final activeMeta = boardState.activeEnemyMeta;
+      if (activeMeta != null) {
+        String filename = activeMeta.id.replaceAll('e_', '');
+        // Fallbacks for safety
+        if (filename == 'wind_ranger') filename = 'air_assasin';
+        if (filename == 'stone_golem' || filename == 'boss_ancient_golem') filename = 'ancient_warrior';
+        if (filename == 'fire_mage') filename = 'fire_golem';
+        if (filename == 'cyber_scout') filename = 'robot_crow';
+        if (filename == 'cosmic_spectre') filename = 'cosmic_assasin';
+        if (filename == 'toxic_slime') filename = 'toxic_wizard';
+        
+        assetPath = 'assets/images/characters/$filename.png';
+      } else {
+        assetPath = 'assets/images/characters/default.png';
+      }
+    }
+
 
     Widget buildTooltipBubble(String title, String description, Color color) {
       return Container(
@@ -493,37 +512,47 @@ class _CharacterDisplayWidgetState extends State<CharacterDisplayWidget> {
           alignment: Alignment.center,
           children: [
             () {
+              Widget img = Image.asset(
+                assetPath,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: widget.isPlayer
+                          ? Colors.blue.withValues(alpha: 0.2)
+                          : Colors.red.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: widget.isPlayer ? Colors.blue : Colors.red,
+                        width: 2,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        widget.isPlayer ? 'Player' : 'Enemy',
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+
+              // Flip enemy image horizontally since all assets face right
+              if (!widget.isPlayer) {
+                img = Transform.scale(
+                  scaleX: -1,
+                  child: img,
+                );
+              }
+
               Widget sprite = SizedBox(
                 width: widget.width,
                 height: widget.height,
-                child: Image.asset(
-                  assetPath,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: widget.isPlayer
-                            ? Colors.blue.withValues(alpha: 0.2)
-                            : Colors.red.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: widget.isPlayer ? Colors.blue : Colors.red,
-                          width: 2,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          widget.isPlayer ? 'Player' : 'Enemy',
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                child: img,
               );
 
               // Apply target animation based on state

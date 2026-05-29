@@ -143,12 +143,6 @@ class _ShopScreenState extends State<ShopScreen> {
       setState(() {
         _isConsumableSold[index] = true;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Berhasil membeli ${consumable.name}! Tersimpan di Slot Ramuan.'),
-          backgroundColor: consumable.themeColor,
-        ),
-      );
     }
   }
 
@@ -173,7 +167,7 @@ class _ShopScreenState extends State<ShopScreen> {
             // WALLPAPER BACKGROUND (DENGAN OVERLAY GELAP)
             Positioned.fill(
               child: Image.asset(
-                'assets/images/background/main_menu_bg.jpg',
+                'assets/images/background/shop.jpg',
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return Container(color: const Color(0xFF0F0F0F));

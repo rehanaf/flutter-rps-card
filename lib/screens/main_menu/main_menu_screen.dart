@@ -24,7 +24,7 @@ class MainMenuScreen extends StatelessWidget {
           // LAYER 1: Gambar Latar Belakang Menu Utama
           Positioned.fill(
             child: Image.asset(
-              'assets/images/background/main_menu_bg.jpg', 
+              'assets/images/background/main_menu.jpg', 
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 // Fallback jika file gambar background belum dimasukkan ke assets
@@ -48,96 +48,116 @@ class MainMenuScreen extends StatelessWidget {
 
           // LAYER 2: Konten Menu Utama (Judul Game & Tombol-Tombol Aksi)
           SafeArea(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // JUDUL BESAR GAME (Pakai Font Outfit)
-                  Text(
-                    localization.getUiText('appTitle').toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 56,
-                      fontWeight: FontWeight.w900, // Sangat tebal khas font Outfit
-                      color: Color(0xFFC5A059),   // Warna emas premium
-                      letterSpacing: 6,
-                      shadows: [
-                        Shadow(color: Colors.black87, offset: Offset(0, 6), blurRadius: 10),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    "101-CARD CIRCULAR STRATEGY",
-                    style: TextStyle(
-                      color: Colors.white60,
-                      fontSize: 16,
-                      letterSpacing: 4,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 50),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final double screenHeight = MediaQuery.of(context).size.height;
 
-                  // DAFTAR TOMBOL UTAMA
-                  _buildMenuButton(
-                    context,
-                    label: localization.getUiText('playButton'),
-                    icon: Icons.play_arrow_rounded,
-                    onPressed: () {
-                      final playerRun = context.read<PlayerRun>();
-                      // Memulai petualangan baru dengan starter deck default terpusat
-                      playerRun.startNewRun();
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // JUDUL BESAR GAME (Skala responsif dengan FittedBox)
+                            SizedBox(
+                              width: constraints.maxWidth * 0.9,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  localization.getUiText('appTitle').toUpperCase(),
+                                  style: const TextStyle(
+                                    fontSize: 56,
+                                    fontWeight: FontWeight.w900,
+                                    color: Color(0xFFC5A059),
+                                    letterSpacing: 6,
+                                    shadows: [
+                                      Shadow(color: Colors.black87, offset: Offset(0, 6), blurRadius: 10),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            // SUBTITLE (Skala responsif dengan FittedBox)
+                            SizedBox(
+                              width: constraints.maxWidth * 0.8,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: const Text(
+                                  "101-CARD CIRCULAR STRATEGY",
+                                  style: TextStyle(
+                                    color: Colors.white60,
+                                    fontSize: 16,
+                                    letterSpacing: 4,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            
+                            SizedBox(height: screenHeight * 0.05),
 
-                      // Pindah rute ke Map Screen
-                      Navigator.pushNamed(context, MapScreen.routeName);
-                      
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            localization.locale.languageCode == 'id'
-                                ? 'Petualangan Baru Dimulai! Menuju Map...'
-                                : 'New Adventure Started! Entering Map...',
-                          ),
+                            // DAFTAR TOMBOL UTAMA
+                            _buildMenuButton(
+                              context,
+                              label: localization.getUiText('playButton'),
+                              icon: Icons.play_arrow_rounded,
+                              onPressed: () {
+                                final playerRun = context.read<PlayerRun>();
+                                // Memulai petualangan baru dengan starter deck default terpusat
+                                playerRun.startNewRun();
+
+                                // Pindah rute ke Map Screen
+                                Navigator.pushNamed(context, MapScreen.routeName);
+                              },
+                            ),
+                            
+                            const SizedBox(height: 12),
+                            
+                            _buildMenuButton(
+                              context,
+                              label: localization.getUiText('collectionButton'),
+                              icon: Icons.collections_rounded,
+                              onPressed: () {
+                                Navigator.pushNamed(context, CollectionScreen.routeName);
+                              },
+                            ),
+                            
+                            const SizedBox(height: 12),
+
+                            _buildMenuButton(
+                              context,
+                              label: localization.getUiText('howToPlayButton'),
+                              icon: Icons.menu_book_rounded,
+                              onPressed: () {
+                                Navigator.pushNamed(context, HowToPlayScreen.routeName);
+                              },
+                            ),
+                            
+                            const SizedBox(height: 12),
+                            
+                            _buildMenuButton(
+                              context,
+                              label: localization.getUiText('settingsButton'),
+                              icon: Icons.settings_rounded,
+                              onPressed: () {
+                                _showSettingsOverlay(context);
+                              },
+                            ),
+                          ],
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   ),
-                  
-                  const SizedBox(height: 12),
-                  
-                  _buildMenuButton(
-                    context,
-                    label: localization.getUiText('collectionButton'),
-                    icon: Icons.collections_rounded,
-                    onPressed: () {
-                      Navigator.pushNamed(context, CollectionScreen.routeName);
-                    },
-                  ),
-                  
-                  const SizedBox(height: 12),
-
-                  _buildMenuButton(
-                    context,
-                    label: localization.getUiText('howToPlayButton'),
-                    icon: Icons.menu_book_rounded,
-                    onPressed: () {
-                      Navigator.pushNamed(context, HowToPlayScreen.routeName);
-                    },
-                  ),
-                  
-                  const SizedBox(height: 12),
-                  
-                  _buildMenuButton(
-                    context,
-                    label: localization.getUiText('settingsButton'),
-                    icon: Icons.settings_rounded,
-                    onPressed: () {
-                      _showSettingsOverlay(context);
-                    },
-                  ),
-                  
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
@@ -165,10 +185,9 @@ class MainMenuScreen extends StatelessWidget {
             insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
-                const double dialogWidth = 460;
-                
                 return Container(
-                  width: dialogWidth,
+                  constraints: const BoxConstraints(maxWidth: 460),
+                  width: double.infinity,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     color: const Color(0xFA1E1E1E), // Solid dark with premium gloss
@@ -182,172 +201,175 @@ class MainMenuScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // TITLE
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.settings_rounded,
-                            color: Color(0xFFC5A059),
-                            size: 28,
-                          ),
-                          const SizedBox(width: 10),
-                          Text(
-                            localization.getUiText('settingsTitle').toUpperCase(),
-                            style: const TextStyle(
-                              color: Color(0xFFC5A059),
-                              fontSize: 22,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 2,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      const Divider(color: Color(0x33C5A059), thickness: 1.5),
-                      const SizedBox(height: 16),
-
-                      // SETTINGS CONTENT
-                      // 1. Music Setting Row
-                      _buildSettingRow(
-                        icon: Icons.music_note_rounded,
-                        title: localization.locale.languageCode == 'id' ? 'Musik Latar' : 'Background Music',
-                        control: Switch(
-                          value: tempMusic,
-                          activeThumbColor: const Color(0xFFC5A059),
-                          activeTrackColor: const Color(0x4DC5A059),
-                          inactiveThumbColor: Colors.grey,
-                          inactiveTrackColor: Colors.black26,
-                          onChanged: (val) {
-                            setState(() {
-                              tempMusic = val;
-                            });
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      // 2. SFX Setting Row
-                      _buildSettingRow(
-                        icon: Icons.volume_up_rounded,
-                        title: localization.locale.languageCode == 'id' ? 'Efek Suara' : 'Sound Effects',
-                        control: Switch(
-                          value: tempSfx,
-                          activeThumbColor: const Color(0xFFC5A059),
-                          activeTrackColor: const Color(0x4DC5A059),
-                          inactiveThumbColor: Colors.grey,
-                          inactiveTrackColor: Colors.black26,
-                          onChanged: (val) {
-                            setState(() {
-                              tempSfx = val;
-                            });
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      // 3. Language Setting Row
-                      _buildSettingRow(
-                        icon: Icons.language_rounded,
-                        title: localization.locale.languageCode == 'id' ? 'Bahasa' : 'Language',
-                        control: Row(
-                          mainAxisSize: MainAxisSize.min,
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // TITLE
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _buildLanguageOption(
-                              label: "ID",
-                              isSelected: tempLocale.languageCode == 'id',
-                              onTap: () {
-                                setState(() {
-                                  tempLocale = const Locale('id');
-                                });
-                              },
+                            const Icon(
+                              Icons.settings_rounded,
+                              color: Color(0xFFC5A059),
+                              size: 28,
                             ),
-                            const SizedBox(width: 8),
-                            _buildLanguageOption(
-                              label: "EN",
-                              isSelected: tempLocale.languageCode == 'en',
-                              onTap: () {
-                                setState(() {
-                                  tempLocale = const Locale('en');
-                                });
-                              },
+                            const SizedBox(width: 10),
+                            Text(
+                              localization.getUiText('settingsTitle').toUpperCase(),
+                              style: const TextStyle(
+                                color: Color(0xFFC5A059),
+                                fontSize: 22,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 2,
+                              ),
                             ),
                           ],
                         ),
-                      ),
+                        const SizedBox(height: 8),
+                        const Divider(color: Color(0x33C5A059), thickness: 1.5),
+                        const SizedBox(height: 16),
 
-                      const SizedBox(height: 20),
-                      const Divider(color: Color(0x1AC5A059), thickness: 1.5),
-                      const SizedBox(height: 12),
-
-                      // DEVELOPER INFO / CREDITS
-                      Text(
-                        localization.locale.languageCode == 'id'
-                            ? "VERSI 1.0.0 • DIKEMBANGKAN OLEH ANTIGRAVITY"
-                            : "VERSION 1.0.0 • DEVELOPED BY ANTIGRAVITY",
-                        style: const TextStyle(
-                          color: Colors.white30,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      // ACTION BUTTONS (Simpan / Batal)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          // Batal Button
-                          TextButton(
-                            style: TextButton.styleFrom(
-                              foregroundColor: Colors.white70,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            ),
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(
-                              localization.getUiText('cancelButton').toUpperCase(),
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.0,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          // Simpan Button
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFC5A059),
-                              foregroundColor: const Color(0xFF1E1E1E),
-                              elevation: 3,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                            ),
-                            onPressed: () {
-                              // Terapkan perubahan ke provider global
-                              settingsProvider.setMusic(tempMusic);
-                              settingsProvider.setSfx(tempSfx);
-                              settingsProvider.setLocale(tempLocale);
-                              Navigator.pop(context);
+                        // SETTINGS CONTENT
+                        // 1. Music Setting Row
+                        _buildSettingRow(
+                          icon: Icons.music_note_rounded,
+                          title: localization.locale.languageCode == 'id' ? 'Musik Latar' : 'Background Music',
+                          control: Switch(
+                            value: tempMusic,
+                            activeThumbColor: const Color(0xFFC5A059),
+                            activeTrackColor: const Color(0x4DC5A059),
+                            inactiveThumbColor: Colors.grey,
+                            inactiveTrackColor: Colors.black26,
+                            onChanged: (val) {
+                              setState(() {
+                                tempMusic = val;
+                              });
                             },
-                            child: Text(
-                              localization.getUiText('saveButton').toUpperCase(),
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 1.0,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // 2. SFX Setting Row
+                        _buildSettingRow(
+                          icon: Icons.volume_up_rounded,
+                          title: localization.locale.languageCode == 'id' ? 'Efek Suara' : 'Sound Effects',
+                          control: Switch(
+                            value: tempSfx,
+                            activeThumbColor: const Color(0xFFC5A059),
+                            activeTrackColor: const Color(0x4DC5A059),
+                            inactiveThumbColor: Colors.grey,
+                            inactiveTrackColor: Colors.black26,
+                            onChanged: (val) {
+                              setState(() {
+                                tempSfx = val;
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // 3. Language Setting Row
+                        _buildSettingRow(
+                          icon: Icons.language_rounded,
+                          title: localization.locale.languageCode == 'id' ? 'Bahasa' : 'Language',
+                          control: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildLanguageOption(
+                                label: "ID",
+                                isSelected: tempLocale.languageCode == 'id',
+                                onTap: () {
+                                  setState(() {
+                                    tempLocale = const Locale('id');
+                                  });
+                                },
+                              ),
+                              const SizedBox(width: 8),
+                              _buildLanguageOption(
+                                label: "EN",
+                                isSelected: tempLocale.languageCode == 'en',
+                                onTap: () {
+                                  setState(() {
+                                    tempLocale = const Locale('en');
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+                        const Divider(color: Color(0x1AC5A059), thickness: 1.5),
+                        const SizedBox(height: 12),
+
+                        // DEVELOPER INFO / CREDITS
+                        Text(
+                          localization.locale.languageCode == 'id'
+                              ? "VERSI 1.0.0 • DIKEMBANGKAN OLEH ANTIGRAVITY"
+                              : "VERSION 1.0.0 • DEVELOPED BY ANTIGRAVITY",
+                          style: const TextStyle(
+                            color: Colors.white30,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+
+                        // ACTION BUTTONS (Simpan / Batal)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            // Batal Button
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.white70,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(
+                                localization.getUiText('cancelButton').toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 1.0,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            const SizedBox(width: 12),
+                            // Simpan Button
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFC5A059),
+                                foregroundColor: const Color(0xFF1E1E1E),
+                                elevation: 3,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              ),
+                              onPressed: () {
+                                // Terapkan perubahan ke provider global
+                                settingsProvider.setMusic(tempMusic);
+                                settingsProvider.setSfx(tempSfx);
+                                settingsProvider.setLocale(tempLocale);
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                localization.getUiText('saveButton').toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
@@ -448,7 +470,7 @@ class MainMenuScreen extends StatelessWidget {
               label,
               style: const TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.w700, // Bold Outfit
+                fontWeight: FontWeight.w700, // Bold
                 letterSpacing: 1.5,
               ),
             ),

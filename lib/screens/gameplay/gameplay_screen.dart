@@ -55,7 +55,7 @@ class GameplayScreen extends StatelessWidget {
                   fit: StackFit.expand,
                   children: [
                     Image.asset(
-                      'assets/images/background/main_menu_bg.jpg',
+                      'assets/images/background/gameplay.jpg',
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(color: const Color(0xFF0F0F0F));
@@ -130,32 +130,12 @@ class GameplayScreen extends StatelessWidget {
                               : null,
                         ),
                         child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.ads_click_rounded,
-                                color: isHighlighted
-                                    ? const Color(0xFFC5A059)
-                                    : Colors.white12,
-                                size: 24,
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                isHighlighted
-                                    ? "Lepas Kartu Sekarang!"
-                                    : "Geser Kartu / Ramuan ke Sini",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: isHighlighted
-                                      ? const Color(0xFFC5A059)
-                                      : Colors.white24,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ],
+                          child: Icon(
+                            Icons.ads_click_rounded,
+                            color: isHighlighted
+                                ? const Color(0xFFC5A059)
+                                : Colors.white12,
+                            size: 28,
                           ),
                         ),
                       ),

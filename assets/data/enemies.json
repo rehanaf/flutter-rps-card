@@ -1,63 +1,108 @@
 [
   {
-    "id": "e_fire_mage",
-    "name": "Fire Mage",
-    "base_hp": 42,
+    "id": "e_toxic_wizard",
+    "name": "Toxic Wizard",
+    "base_hp": 45,
+    "archetype": "Toxic",
+    "deck_size": 10,
+    "synergy_count": 7,
+    "random_count": 3
+  },
+  {
+    "id": "e_robot_crow",
+    "name": "Robot Crow",
+    "base_hp": 50,
+    "archetype": "Robot",
+    "deck_size": 10,
+    "synergy_count": 7,
+    "random_count": 3
+  },
+  {
+    "id": "e_air_assasin",
+    "name": "Air Assassin",
+    "base_hp": 55,
+    "archetype": "Air",
+    "deck_size": 10,
+    "synergy_count": 7,
+    "random_count": 3
+  },
+  {
+    "id": "e_fire_golem",
+    "name": "Fire Golem",
+    "base_hp": 60,
     "archetype": "Fire",
     "deck_size": 10,
     "synergy_count": 7,
     "random_count": 3
   },
   {
-    "id": "e_stone_golem",
-    "name": "Stone Golem",
-    "base_hp": 38,
+    "id": "e_ancient_warrior",
+    "name": "Ancient Warrior",
+    "base_hp": 65,
     "archetype": "Ancient",
     "deck_size": 10,
     "synergy_count": 7,
     "random_count": 3
   },
   {
-    "id": "e_wind_ranger",
-    "name": "Wind Ranger",
-    "base_hp": 30,
-    "archetype": "Air",
-    "deck_size": 10,
-    "synergy_count": 6,
-    "random_count": 4
-  },
-  {
-    "id": "e_toxic_slime",
-    "name": "Toxic Slime",
-    "base_hp": 20,
-    "archetype": "Toxic",
-    "deck_size": 10,
-    "synergy_count": 6,
-    "random_count": 4
-  },
-  {
-    "id": "e_cosmic_spectre",
-    "name": "Cosmic Spectre",
-    "base_hp": 48,
+    "id": "e_cosmic_assasin",
+    "name": "Cosmic Assassin",
+    "base_hp": 70,
     "archetype": "Cosmic",
     "deck_size": 10,
+    "synergy_count": 8,
+    "random_count": 2
+  },
+  {
+    "id": "e_dark_vampire",
+    "name": "Dark Vampire",
+    "base_hp": 52,
+    "archetype": "Spirit",
+    "deck_size": 10,
     "synergy_count": 7,
     "random_count": 3
   },
   {
-    "id": "e_cyber_scout",
-    "name": "Cyber Scout",
-    "base_hp": 25,
-    "archetype": "Robot",
+    "id": "e_energy_wizard",
+    "name": "Energy Wizard",
+    "base_hp": 58,
+    "archetype": "Energy",
     "deck_size": 10,
-    "synergy_count": 6,
-    "random_count": 4
+    "synergy_count": 7,
+    "random_count": 3
   },
   {
-    "id": "e_boss_ancient_golem",
-    "name": "Ancient Golem Boss",
-    "base_hp": 80,
-    "archetype": "Ancient",
+    "id": "e_liquid_wizard",
+    "name": "Liquid Wizard",
+    "base_hp": 50,
+    "archetype": "Liquid",
+    "deck_size": 10,
+    "synergy_count": 7,
+    "random_count": 3
+  },
+  {
+    "id": "e_nature_wolf",
+    "name": "Nature Wolf",
+    "base_hp": 48,
+    "archetype": "Nature",
+    "deck_size": 10,
+    "synergy_count": 7,
+    "random_count": 3
+  },
+  {
+    "id": "e_spirit_demon",
+    "name": "Spirit Demon",
+    "base_hp": 68,
+    "archetype": "Spirit",
+    "deck_size": 10,
+    "synergy_count": 8,
+    "random_count": 2
+  },
+  {
+    "id": "e_boss_skeleton",
+    "name": "Skeleton Boss",
+    "base_hp": 100,
+    "archetype": "Spirit",
     "deck_size": 12,
     "synergy_count": 9,
     "random_count": 3

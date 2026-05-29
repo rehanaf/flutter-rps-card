@@ -35,7 +35,7 @@ class _HowToPlayScreenState extends State<HowToPlayScreen> with SingleTickerProv
           // 1. Wallpaper Background dengan overlay gelap
           Positioned.fill(
             child: Image.asset(
-              'assets/images/background/main_menu_bg.jpg',
+              'assets/images/background/main_menu.jpg',
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(color: const Color(0xFF0F0F0F));
