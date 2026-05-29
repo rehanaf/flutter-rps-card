@@ -1,967 +1,707 @@
 {
   "cards": [
     {
-      "win": {
-        "self_strength": 5
-      },
+      "win": {},
       "lose": {},
       "id": "1",
       "power": 13,
       "synergy": "Fire"
     },
     {
-      "win": {
-        "self_immunity": 1
-      },
+      "win": {},
       "lose": {},
       "id": "2",
       "power": 11,
       "synergy": "Air"
     },
     {
-      "win": {
-        "self_heal": 4
-      },
+      "win": {},
       "lose": {},
       "id": "3",
       "power": 8,
       "synergy": "Nature"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "4",
       "power": 8,
       "synergy": "Nature"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "5",
       "power": 6,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "self_delay_shield": 5
-      },
+      "win": {},
       "lose": {},
       "id": "6",
       "power": 12,
       "synergy": "Robot"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "7",
       "power": 10,
       "synergy": "Spirit"
     },
     {
-      "win": {
-        "self_strength": 1
-      },
-      "lose": {
-        "self_shield": 5
-      },
+      "win": {},
+      "lose": {},
       "id": "8",
       "power": 7,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "self_strength": 1
-      },
-      "lose": {
-        "self_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "9",
       "power": 11,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "self_strength": 1
-      },
-      "lose": {
-        "self_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "10",
       "power": 9,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "11",
       "power": 15,
       "synergy": "Spirit"
     },
     {
-      "win": {
-        "self_delay_shield": 12
-      },
+      "win": {},
       "lose": {},
       "id": "12",
       "power": 5,
       "synergy": "Nature"
     },
     {
-      "win": {
-        "self_delay_dot": 6
-      },
+      "win": {},
       "lose": {},
       "id": "13",
       "power": 14,
       "synergy": "Fire"
     },
     {
-      "win": {
-        "self_delay_shield": 5
-      },
+      "win": {},
       "lose": {},
       "id": "14",
       "power": 5,
       "synergy": "Robot"
     },
     {
-      "win": {
-        "self_delay_dot": 6
-      },
+      "win": {},
       "lose": {},
       "id": "15",
       "power": 12,
       "synergy": "Fire"
     },
     {
-      "win": {
-        "self_delay_shield": 5
-      },
+      "win": {},
       "lose": {},
       "id": "16",
       "power": 12,
       "synergy": "Robot"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "17",
       "power": 7,
       "synergy": "Spirit"
     },
     {
-      "win": {
-        "self_strength": 1
-      },
-      "lose": {
-        "self_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "18",
       "power": 6,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "self_delay_dot": 6
-      },
+      "win": {},
       "lose": {},
       "id": "19",
       "power": 9,
       "synergy": "Toxic"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "20",
       "power": 7,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "self_strength": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "21",
       "power": 10,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "22",
       "power": 4,
       "synergy": "Spirit"
     },
     {
-      "win": {
-        "self_delay_counter": 8
-      },
+      "win": {},
       "lose": {},
       "id": "23",
       "power": 11,
       "synergy": "Robot"
     },
     {
-      "win": {
-        "self_delay_shield": 12
-      },
+      "win": {},
       "lose": {},
       "id": "24",
       "power": 8,
       "synergy": "Ancient"
     },
     {
-      "win": {
-        "self_delay_dot": 2
-      },
-      "lose": {
-        "self_vulnerable": 1
-      },
+      "win": {},
+      "lose": {},
       "id": "25",
       "power": 9,
       "synergy": "Toxic"
     },
     {
-      "win": {
-        "self_vulnerable": 2
-      },
+      "win": {},
       "lose": {},
       "id": "26",
       "power": 9,
       "synergy": "Toxic"
     },
     {
-      "win": {
-        "self_heal": 4
-      },
+      "win": {},
       "lose": {},
       "id": "27",
       "power": 8,
       "synergy": "Nature"
     },
     {
-      "win": {
-        "self_delay_dot": 2
-      },
-      "lose": {
-        "self_vulnerable": 1
-      },
+      "win": {},
+      "lose": {},
       "id": "28",
       "power": 9,
       "synergy": "Toxic"
     },
     {
-      "win": {
-        "self_heal": 4
-      },
+      "win": {},
       "lose": {},
       "id": "29",
       "power": 7,
       "synergy": "Nature"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "30",
       "power": 13,
       "synergy": "Spirit"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "31",
       "power": 13,
       "synergy": "Spirit"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "32",
       "power": 12,
       "synergy": "Spirit"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "33",
       "power": 12,
       "synergy": "Spirit"
     },
     {
-      "win": {
-        "self_strength": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "34",
       "power": 11,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "self_strength": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "35",
       "power": 8,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "strength": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "36",
       "power": 3,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "strength": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "37",
       "power": 10,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "strength": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "38",
       "power": 6,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "self_delay_shield": 5
-      },
+      "win": {},
       "lose": {},
       "id": "39",
       "power": 13,
       "synergy": "Robot"
     },
     {
-      "win": {
-        "self_delay_shield": 5
-      },
+      "win": {},
       "lose": {},
       "id": "40",
       "power": 11,
       "synergy": "Robot"
     },
     {
-      "win": {
-        "immunity": 1
-      },
+      "win": {},
       "lose": {},
       "id": "41",
       "power": 6,
       "synergy": "Air"
     },
     {
-      "win": {
-        "self_delay_shield": 5
-      },
+      "win": {},
       "lose": {},
       "id": "42",
       "power": 4,
       "synergy": "Robot"
     },
     {
-      "win": {
-        "self_heal": 4
-      },
+      "win": {},
       "lose": {},
       "id": "43",
       "power": 8,
       "synergy": "Nature"
     },
     {
-      "win": {
-        "self_heal": 4
-      },
+      "win": {},
       "lose": {},
       "id": "44",
       "power": 4,
       "synergy": "Nature"
     },
     {
-      "win": {
-        "self_heal": 4
-      },
+      "win": {},
       "lose": {},
       "id": "45",
       "power": 5,
       "synergy": "Nature"
     },
     {
-      "win": {
-        "self_heal": 4
-      },
+      "win": {},
       "lose": {},
       "id": "46",
       "power": 10,
       "synergy": "Nature"
     },
     {
-      "win": {
-        "self_heal": 4
-      },
+      "win": {},
       "lose": {},
       "id": "47",
       "power": 6,
       "synergy": "Nature"
     },
     {
-      "win": {
-        "self_heal": 4
-      },
+      "win": {},
       "lose": {},
       "id": "48",
       "power": 6,
       "synergy": "Nature"
     },
     {
-      "win": {
-        "self_delay_shield": 3
-      },
-      "lose": {
-        "self_heal": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "49",
       "power": 5,
       "synergy": "Liquid"
     },
     {
-      "win": {
-        "dot": 2
-      },
-      "lose": {
-        "self_delay_weaken": 1
-      },
+      "win": {},
+      "lose": {},
       "id": "50",
       "power": 8,
       "synergy": "Toxic"
     },
     {
-      "win": {
-        "self_heal": 4
-      },
+      "win": {},
       "lose": {},
       "id": "51",
       "power": 3,
       "synergy": "Nature"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "52",
       "power": 12,
       "synergy": "Spirit"
     },
     {
-      "win": {
-        "strength": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "53",
       "power": 9,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "54",
       "power": 11,
       "synergy": "Spirit"
     },
     {
-      "win": {
-        "strength": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "55",
       "power": 13,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "dot": 2
-      },
-      "lose": {
-        "self_vulnerable": 1
-      },
+      "win": {},
+      "lose": {},
       "id": "56",
       "power": 13,
       "synergy": "Toxic"
     },
     {
-      "win": {
-        "strength": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "57",
       "power": 4,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "self_delay_shield": 4
-      },
+      "win": {},
       "lose": {},
       "id": "58",
       "power": 9,
       "synergy": "Ancient"
     },
     {
-      "win": {
-        "self_delay_shield": 3
-      },
-      "lose": {
-        "self_heal": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "59",
       "power": 4,
       "synergy": "Liquid"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "60",
       "power": 7,
       "synergy": "Spirit"
     },
     {
-      "win": {
-        "strength": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "61",
       "power": 5,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "self_delay_shield": 1
-      },
+      "win": {},
       "lose": {},
       "id": "62",
       "power": 7,
       "synergy": "Air"
     },
     {
-      "win": {
-        "self_delay_shield": 5
-      },
+      "win": {},
       "lose": {},
       "id": "63",
       "power": 13,
       "synergy": "Robot"
     },
     {
-      "win": {
-        "immunity": 1
-      },
+      "win": {},
       "lose": {},
       "id": "64",
       "power": 11,
       "synergy": "Cosmic"
     },
     {
-      "win": {
-        "self_heal": 4
-      },
+      "win": {},
       "lose": {},
       "id": "65",
       "power": 4,
       "synergy": "Nature"
     },
     {
-      "win": {
-        "self_delay_shield": 5
-      },
+      "win": {},
       "lose": {},
       "id": "66",
       "power": 6,
       "synergy": "Robot"
     },
     {
-      "win": {
-        "self_delay_shield": 3
-      },
-      "lose": {
-        "self_heal": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "67",
       "power": 5,
       "synergy": "Liquid"
     },
     {
-      "win": {
-        "self_delay_shield": 1
-      },
+      "win": {},
       "lose": {},
       "id": "68",
       "power": 6,
       "synergy": "Air"
     },
     {
-      "win": {
-        "self_delay_shield": 1
-      },
+      "win": {},
       "lose": {},
       "id": "69",
       "power": 14,
       "synergy": "Cosmic"
     },
     {
-      "win": {
-        "strength": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "70",
       "power": 8,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "strength": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "71",
       "power": 5,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "strength": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "72",
       "power": 4,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "self_delay_shield": 3
-      },
-      "lose": {
-        "self_heal": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "73",
       "power": 6,
       "synergy": "Liquid"
     },
     {
-      "win": {
-        "self_delay_shield": 3
-      },
-      "lose": {
-        "self_heal": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "74",
       "power": 7,
       "synergy": "Liquid"
     },
     {
-      "win": {
-        "self_delay_shield": 3
-      },
-      "lose": {
-        "self_heal": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "75",
       "power": 8,
       "synergy": "Liquid"
     },
     {
-      "win": {
-        "self_delay_shield": 5
-      },
+      "win": {},
       "lose": {},
       "id": "76",
       "power": 6,
       "synergy": "Robot"
     },
     {
-      "win": {
-        "self_vulnerable": 1
-      },
+      "win": {},
       "lose": {},
       "id": "77",
       "power": 9,
       "synergy": "Cosmic"
     },
     {
-      "win": {
-        "self_vulnerable": 1
-      },
+      "win": {},
       "lose": {},
       "id": "78",
       "power": 13,
       "synergy": "Cosmic"
     },
     {
-      "win": {
-        "self_vulnerable": 1
-      },
+      "win": {},
       "lose": {},
       "id": "79",
       "power": 13,
       "synergy": "Cosmic"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "80",
       "power": 8,
       "synergy": "Spirit"
     },
     {
-      "win": {
-        "self_heal": 4
-      },
+      "win": {},
       "lose": {},
       "id": "81",
       "power": 12,
       "synergy": "Nature"
     },
     {
-      "win": {
-        "self_delay_shield": 4
-      },
+      "win": {},
       "lose": {},
       "id": "82",
       "power": 14,
       "synergy": "Ancient"
     },
     {
-      "win": {
-        "dot": 3
-      },
+      "win": {},
       "lose": {},
       "id": "83",
       "power": 14,
       "synergy": "Fire"
     },
     {
-      "win": {
-        "self_delay_shield": 4
-      },
+      "win": {},
       "lose": {},
       "id": "84",
       "power": 13,
       "synergy": "Ancient"
     },
     {
-      "win": {
-        "self_delay_counter": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "85",
       "power": 12,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "self_delay_counter": 1
-      },
-      "lose": {
-        "self_delay_shield": 2
-      },
+      "win": {},
+      "lose": {},
       "id": "86",
       "power": 12,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "self_delay_shield": 4
-      },
+      "win": {},
       "lose": {},
       "id": "87",
       "power": 14,
       "synergy": "Ancient"
     },
     {
-      "win": {
-        "self_delay_shield": 12
-      },
+      "win": {},
       "lose": {},
       "id": "88",
       "power": 5,
       "synergy": "Basic"
     },
     {
-      "win": {
-        "self_delay_shield": 5
-      },
+      "win": {},
       "lose": {},
       "id": "89",
       "power": 8,
       "synergy": "Robot"
     },
     {
-      "win": {
-        "self_delay_counter": 8
-      },
+      "win": {},
       "lose": {},
       "id": "90",
       "power": 11,
       "synergy": "Spirit"
     },
     {
-      "win": {
-        "self_delay_shield": 5
-      },
+      "win": {},
       "lose": {},
       "id": "91",
       "power": 12,
       "synergy": "Robot"
     },
     {
-      "win": {
-        "enemy_delay_weaken": 2
-      },
+      "win": {},
       "lose": {},
       "id": "92",
       "power": 10,
       "synergy": "Spirit"
     },
     {
-      "win": {
-        "self_strength": 2
-      },
+      "win": {},
       "lose": {},
       "id": "93",
       "power": 13,
       "synergy": "Energy"
     },
     {
-      "win": {
-        "self_vulnerable": 2
-      },
+      "win": {},
       "lose": {},
       "id": "94",
       "power": 14,
       "synergy": "Fire"
     },
     {
-      "win": {
-        "self_delay_shield": 4
-      },
+      "win": {},
       "lose": {},
       "id": "95",
       "power": 14,
       "synergy": "Ancient"
     },
     {
-      "win": {
-        "self_strength": 2
-      },
+      "win": {},
       "lose": {},
       "id": "96",
       "power": 15,
       "synergy": "Energy"
     },
     {
-      "win": {
-        "self_strength": 2
-      },
+      "win": {},
       "lose": {},
       "id": "97",
       "power": 13,
       "synergy": "Energy"
     },
     {
-      "win": {
-        "enemy_delay_dot": 3
-      },
+      "win": {},
       "lose": {},
       "id": "98",
       "power": 15,
       "synergy": "Fire"
     },
     {
-      "win": {
-        "self_immunity": 1
-      },
+      "win": {},
       "lose": {},
       "id": "99",
       "power": 10,
       "synergy": "Air"
     },
     {
-      "win": {
-        "self_delay_shield": 5
-      },
+      "win": {},
       "lose": {},
       "id": "100",
       "power": 12,
       "synergy": "Robot"
     },
     {
-      "win": {
-        "self_delay_shield": 5
-      },
+      "win": {},
       "lose": {},
       "id": "101",
       "power": 13,

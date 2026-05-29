@@ -163,19 +163,63 @@ class GameplayScreen extends StatelessWidget {
             Positioned(
               left: screenSize.width * 0.08,
               bottom: (screenSize.height * 0.32 + 8 - (cardWidth / 2)) - 36,
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTapDown: (details) {
-                  boardState.setHoveredCardIndex(null);
-                  final pos = details.globalPosition;
-                  boardState.updateActiveGesture("TAP_PLAYER_CHAR", x: pos.dx, y: pos.dy);
-                  boardState.addGestureLog("Player Character onTapDown at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)}) - Clear Zoom");
+              child: DragTarget<Object>(
+                onWillAcceptWithDetails: (details) {
+                  if (details.data is PlayingCard) {
+                    boardState.setDragOverTarget(true, details.data as PlayingCard, screenSize);
+                    boardState.addGestureLog("Drag ENTERED Player Character (Pre-Drop Snap Active)");
+                  }
+                  return details.data is PlayingCard || details.data is ConsumableCard;
                 },
-                child: CharacterDisplayWidget(
-                  isPlayer: true,
-                  width: screenSize.width * 0.22,
-                  height: screenSize.height * 0.28,
-                ),
+                onLeave: (data) {
+                  if (data is PlayingCard) {
+                    boardState.setDragOverTarget(false, null, screenSize);
+                    boardState.addGestureLog("Drag LEFT Player Character (Pre-Drop Snap Cancelled)");
+                  }
+                },
+                onAcceptWithDetails: (details) {
+                  if (details.data is PlayingCard) {
+                    boardState.playCardOnTable(
+                      details.data as PlayingCard,
+                      details.offset.dx,
+                      details.offset.dy,
+                      screenSize,
+                    );
+                    boardState.addGestureLog("Player dropped card on Player Character");
+                  } else if (details.data is ConsumableCard) {
+                    _useConsumableCard(context, boardState, playerRun, details.data as ConsumableCard);
+                    boardState.addGestureLog("Player dropped potion on Player Character");
+                  }
+                  boardState.setDragOverTarget(false, null, screenSize);
+                },
+                builder: (context, candidateData, rejectedData) {
+                  final isHighlighted = candidateData.isNotEmpty;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: isHighlighted ? const Color(0xFFC5A059) : Colors.transparent,
+                        width: isHighlighted ? 2.0 : 0.0,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      color: isHighlighted ? const Color(0x14C5A059) : Colors.transparent,
+                    ),
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onTapDown: (details) {
+                        boardState.setHoveredCardIndex(null);
+                        final pos = details.globalPosition;
+                        boardState.updateActiveGesture("TAP_PLAYER_CHAR", x: pos.dx, y: pos.dy);
+                        boardState.addGestureLog("Player Character onTapDown at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)}) - Clear Zoom");
+                      },
+                      child: CharacterDisplayWidget(
+                        isPlayer: true,
+                        width: screenSize.width * 0.22,
+                        height: screenSize.height * 0.28,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
 
@@ -183,19 +227,63 @@ class GameplayScreen extends StatelessWidget {
             Positioned(
               right: screenSize.width * 0.08,
               bottom: (screenSize.height * 0.32 + 8 - (cardWidth / 2)) - 36,
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTapDown: (details) {
-                  boardState.setHoveredCardIndex(null);
-                  final pos = details.globalPosition;
-                  boardState.updateActiveGesture("TAP_ENEMY_CHAR", x: pos.dx, y: pos.dy);
-                  boardState.addGestureLog("Enemy Character onTapDown at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)}) - Clear Zoom");
+              child: DragTarget<Object>(
+                onWillAcceptWithDetails: (details) {
+                  if (details.data is PlayingCard) {
+                    boardState.setDragOverTarget(true, details.data as PlayingCard, screenSize);
+                    boardState.addGestureLog("Drag ENTERED Enemy Character (Pre-Drop Snap Active)");
+                  }
+                  return details.data is PlayingCard || details.data is ConsumableCard;
                 },
-                child: CharacterDisplayWidget(
-                  isPlayer: false,
-                  width: screenSize.width * 0.22,
-                  height: screenSize.height * 0.28,
-                ),
+                onLeave: (data) {
+                  if (data is PlayingCard) {
+                    boardState.setDragOverTarget(false, null, screenSize);
+                    boardState.addGestureLog("Drag LEFT Enemy Character (Pre-Drop Snap Cancelled)");
+                  }
+                },
+                onAcceptWithDetails: (details) {
+                  if (details.data is PlayingCard) {
+                    boardState.playCardOnTable(
+                      details.data as PlayingCard,
+                      details.offset.dx,
+                      details.offset.dy,
+                      screenSize,
+                    );
+                    boardState.addGestureLog("Player dropped card on Enemy Character");
+                  } else if (details.data is ConsumableCard) {
+                    _useConsumableCard(context, boardState, playerRun, details.data as ConsumableCard);
+                    boardState.addGestureLog("Player dropped potion on Enemy Character");
+                  }
+                  boardState.setDragOverTarget(false, null, screenSize);
+                },
+                builder: (context, candidateData, rejectedData) {
+                  final isHighlighted = candidateData.isNotEmpty;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: isHighlighted ? const Color(0xFFC5A059) : Colors.transparent,
+                        width: isHighlighted ? 2.0 : 0.0,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      color: isHighlighted ? const Color(0x14C5A059) : Colors.transparent,
+                    ),
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.translucent,
+                      onTapDown: (details) {
+                        boardState.setHoveredCardIndex(null);
+                        final pos = details.globalPosition;
+                        boardState.updateActiveGesture("TAP_ENEMY_CHAR", x: pos.dx, y: pos.dy);
+                        boardState.addGestureLog("Enemy Character onTapDown at (${pos.dx.toStringAsFixed(0)}, ${pos.dy.toStringAsFixed(0)}) - Clear Zoom");
+                      },
+                      child: CharacterDisplayWidget(
+                        isPlayer: false,
+                        width: screenSize.width * 0.22,
+                        height: screenSize.height * 0.28,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
 
@@ -471,12 +559,6 @@ class GameplayScreen extends StatelessWidget {
                         Navigator.pop(context);
                         // Kembali ke Peta (tutup gameplay screen)
                         Navigator.pop(context);
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Kartu "${localization.getCardName(cardId)}" ditambahkan ke Deck!'),
-                          ),
-                        );
                       },
                       child: Container(
                         padding: const EdgeInsets.all(6),
@@ -541,10 +623,6 @@ class GameplayScreen extends StatelessWidget {
                       Navigator.pop(context);
                       // Kembali ke Peta (tutup gameplay screen)
                       Navigator.pop(context);
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Melewati hadiah kartu (Deck tetap).')),
-                      );
                     },
                     child: const Text(
                       "LEWATI (SKIP)",
@@ -666,9 +744,6 @@ class GameplayScreen extends StatelessWidget {
     switch (consumable.id) {
       case 'potion_heal':
         if (boardState.player.hp >= boardState.player.maxHp) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('HP Anda sudah penuh!')),
-          );
           return;
         }
         boardState.player.heal(20);
@@ -705,13 +780,6 @@ class GameplayScreen extends StatelessWidget {
       playerRun.removeConsumableAt(index);
       playerRun.updateHpAfterBattle(boardState.player.hp);
       boardState.battleLog = "✨ [Ramuan] ${boardState.player.name} $effectMsg\n${boardState.battleLog}";
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Berhasil menggunakan ${consumable.name}!'),
-          backgroundColor: consumable.themeColor,
-        ),
-      );
     }
   }
 

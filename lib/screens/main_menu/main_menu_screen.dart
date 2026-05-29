@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../board/player_run.dart';
 import '../../services/app_localizations.dart';
-import '../../services/settings_provider.dart';
+import '../../components/settings_dialog.dart';
 import '../collection/collection_screen.dart';
 import '../how_to_play/how_to_play_screen.dart';
 import '../map/map_screen.dart';
+import '../../board/board_state.dart';
+import '../gameplay/gameplay_screen.dart';
 
 class MainMenuScreen extends StatelessWidget {
   static const String routeName = '/main_menu';
@@ -17,6 +19,8 @@ class MainMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Ambil fungsi translate dari service pelokalan yang sudah kita buat
     final localization = AppLocalizations.of(context)!;
+    // Watch status PlayerRun agar menu utama langsung bereaksi jika progres dihapus/dibuat
+    final playerRun = context.watch<PlayerRun>();
 
     return Scaffold(
       body: Stack(
@@ -104,20 +108,59 @@ class MainMenuScreen extends StatelessWidget {
                             
                             SizedBox(height: screenHeight * 0.05),
 
-                            // DAFTAR TOMBOL UTAMA
-                            _buildMenuButton(
-                              context,
-                              label: localization.getUiText('playButton'),
-                              icon: Icons.play_arrow_rounded,
-                              onPressed: () {
-                                final playerRun = context.read<PlayerRun>();
-                                // Memulai petualangan baru dengan starter deck default terpusat
-                                playerRun.startNewRun();
-
-                                // Pindah rute ke Map Screen
-                                Navigator.pushNamed(context, MapScreen.routeName);
-                              },
-                            ),
+                            // DAFTAR TOMBOL UTAMA DENGAN DUKUNGAN CONTINUATION
+                            if (playerRun.hasActiveRun) ...[
+                              // 1. LANJUTKAN PETUALANGAN (Glow emas premium)
+                              _buildMenuButton(
+                                context,
+                                label: localization.getUiText('continueButton'),
+                                icon: Icons.map_rounded,
+                                isHighlighted: true,
+                                onPressed: () {
+                                  if (playerRun.inBattle && playerRun.selectedNodeId != null) {
+                                    final boardState = Provider.of<BoardState>(context, listen: false);
+                                    try {
+                                      final node = playerRun.mapNodes.firstWhere((n) => n.id == playerRun.selectedNodeId);
+                                      final enemyMeta = localization.getEnemyMetadata(node.enemyId);
+                                      if (enemyMeta != null) {
+                                        boardState.initializeBattle(
+                                          playerRun: playerRun,
+                                          enemyMeta: enemyMeta,
+                                          allCards: localization.allCardsMetadata,
+                                        );
+                                        Navigator.pushNamed(context, GameplayScreen.routeName);
+                                        return;
+                                      }
+                                    } catch (e) {
+                                      debugPrint("Failed to resume battle: $e");
+                                    }
+                                  }
+                                  Navigator.pushNamed(context, MapScreen.routeName);
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              
+                              // 2. PETUALANGAN BARU (Menggantikan tombol play biasa dengan konfirmasi)
+                              _buildMenuButton(
+                                context,
+                                label: localization.getUiText('newRunButton'),
+                                icon: Icons.restart_alt_rounded,
+                                onPressed: () {
+                                  _showNewRunConfirmation(context, playerRun, localization);
+                                },
+                              ),
+                            ] else ...[
+                              // TAMPILAN DEFAULT: HANYA TOMBOL PLAY BIASA
+                              _buildMenuButton(
+                                context,
+                                label: localization.getUiText('playButton'),
+                                icon: Icons.play_arrow_rounded,
+                                onPressed: () {
+                                  playerRun.startNewRun();
+                                  Navigator.pushNamed(context, MapScreen.routeName);
+                                },
+                              ),
+                            ],
                             
                             const SizedBox(height: 12),
                             
@@ -167,275 +210,82 @@ class MainMenuScreen extends StatelessWidget {
 
   /// Menampilkan overlay pengaturan interaktif dan premium
   void _showSettingsOverlay(BuildContext context) {
-    final localization = AppLocalizations.of(context)!;
-    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return const SettingsDialog();
+      },
+    );
+  }
 
-    bool tempMusic = settingsProvider.isMusicEnabled;
-    bool tempSfx = settingsProvider.isSfxEnabled;
-    Locale tempLocale = settingsProvider.locale;
-
+  /// Dialog konfirmasi jika ingin menimpa petualangan yang sedang berjalan
+  void _showNewRunConfirmation(BuildContext context, PlayerRun playerRun, AppLocalizations localization) {
     showDialog(
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
         return BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 8.0, sigmaY: 8.0),
-          child: Dialog(
-            backgroundColor: Colors.transparent,
-            insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return Container(
-                  constraints: const BoxConstraints(maxWidth: 460),
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFA1E1E1E), // Solid dark with premium gloss
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFC5A059), width: 2),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black54,
-                        blurRadius: 15,
-                        offset: Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // TITLE
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.settings_rounded,
-                              color: Color(0xFFC5A059),
-                              size: 28,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              localization.getUiText('settingsTitle').toUpperCase(),
-                              style: const TextStyle(
-                                color: Color(0xFFC5A059),
-                                fontSize: 22,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 2,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        const Divider(color: Color(0x33C5A059), thickness: 1.5),
-                        const SizedBox(height: 16),
-
-                        // SETTINGS CONTENT
-                        // 1. Music Setting Row
-                        _buildSettingRow(
-                          icon: Icons.music_note_rounded,
-                          title: localization.locale.languageCode == 'id' ? 'Musik Latar' : 'Background Music',
-                          control: Switch(
-                            value: tempMusic,
-                            activeThumbColor: const Color(0xFFC5A059),
-                            activeTrackColor: const Color(0x4DC5A059),
-                            inactiveThumbColor: Colors.grey,
-                            inactiveTrackColor: Colors.black26,
-                            onChanged: (val) {
-                              setState(() {
-                                tempMusic = val;
-                              });
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-
-                        // 2. SFX Setting Row
-                        _buildSettingRow(
-                          icon: Icons.volume_up_rounded,
-                          title: localization.locale.languageCode == 'id' ? 'Efek Suara' : 'Sound Effects',
-                          control: Switch(
-                            value: tempSfx,
-                            activeThumbColor: const Color(0xFFC5A059),
-                            activeTrackColor: const Color(0x4DC5A059),
-                            inactiveThumbColor: Colors.grey,
-                            inactiveTrackColor: Colors.black26,
-                            onChanged: (val) {
-                              setState(() {
-                                tempSfx = val;
-                              });
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-
-                        // 3. Language Setting Row
-                        _buildSettingRow(
-                          icon: Icons.language_rounded,
-                          title: localization.locale.languageCode == 'id' ? 'Bahasa' : 'Language',
-                          control: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _buildLanguageOption(
-                                label: "ID",
-                                isSelected: tempLocale.languageCode == 'id',
-                                onTap: () {
-                                  setState(() {
-                                    tempLocale = const Locale('id');
-                                  });
-                                },
-                              ),
-                              const SizedBox(width: 8),
-                              _buildLanguageOption(
-                                label: "EN",
-                                isSelected: tempLocale.languageCode == 'en',
-                                onTap: () {
-                                  setState(() {
-                                    tempLocale = const Locale('en');
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-                        const Divider(color: Color(0x1AC5A059), thickness: 1.5),
-                        const SizedBox(height: 12),
-
-                        // DEVELOPER INFO / CREDITS
-                        Text(
-                          localization.locale.languageCode == 'id'
-                              ? "VERSI 1.0.0 • DIKEMBANGKAN OLEH ANTIGRAVITY"
-                              : "VERSION 1.0.0 • DEVELOPED BY ANTIGRAVITY",
-                          style: const TextStyle(
-                            color: Colors.white30,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // ACTION BUTTONS (Simpan / Batal)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            // Batal Button
-                            TextButton(
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.white70,
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              ),
-                              onPressed: () => Navigator.pop(context),
-                              child: Text(
-                                localization.getUiText('cancelButton').toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1.0,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            // Simpan Button
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFC5A059),
-                                foregroundColor: const Color(0xFF1E1E1E),
-                                elevation: 3,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                              ),
-                              onPressed: () {
-                                // Terapkan perubahan ke provider global
-                                settingsProvider.setMusic(tempMusic);
-                                settingsProvider.setSfx(tempSfx);
-                                settingsProvider.setLocale(tempLocale);
-                                Navigator.pop(context);
-                              },
-                              child: Text(
-                                localization.getUiText('saveButton').toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 1.0,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+          child: AlertDialog(
+            backgroundColor: const Color(0xFF1E1E1E),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: const BorderSide(color: Color(0xFFC5A059), width: 2),
+            ),
+            title: Row(
+              children: [
+                const Icon(Icons.warning_amber_rounded, color: Color(0xFFC5A059), size: 28),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    localization.getUiText('confirmNewRunTitle'),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
-                );
-              },
+                ),
+              ],
             ),
+            content: Text(
+              localization.getUiText('confirmNewRunMessage'),
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  localization.getUiText('cancelButton').toUpperCase(),
+                  style: const TextStyle(color: Colors.white60, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFC5A059),
+                  foregroundColor: const Color(0xFF1E1E1E),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pop(context); // Tutup dialog konfirmasi
+                  playerRun.startNewRun(); // Reset progres petualangan
+                  Navigator.pushNamed(context, MapScreen.routeName); // Buka peta petualangan
+                },
+                child: Text(
+                  localization.getUiText('startNewButton').toUpperCase(),
+                  style: const TextStyle(fontWeight: FontWeight.w900),
+                ),
+              ),
+            ],
           ),
         );
       },
-    );
-  }
-
-  Widget _buildSettingRow({
-    required IconData icon,
-    required String title,
-    required Widget control,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Icon(icon, color: const Color(0xCCC5A059), size: 20),
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ],
-        ),
-        control,
-      ],
-    );
-  }
-
-  Widget _buildLanguageOption({
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 44,
-        height: 32,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFC5A059) : const Color(0xFF141414),
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(
-            color: isSelected ? const Color(0xFFC5A059) : const Color(0x33C5A059),
-            width: 1.5,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? const Color(0xFF1E1E1E) : Colors.white60,
-            fontSize: 12,
-            fontWeight: FontWeight.w900,
-          ),
-        ),
-      ),
     );
   }
 
@@ -445,6 +295,7 @@ class MainMenuScreen extends StatelessWidget {
     required String label,
     required IconData icon,
     required VoidCallback onPressed,
+    bool isHighlighted = false,
   }) {
     return SizedBox(
       width: 260,
@@ -453,11 +304,14 @@ class MainMenuScreen extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF1E1E1E),
           foregroundColor: const Color(0xFFC5A059),
-          elevation: 5,
-          shadowColor: Colors.black,
+          elevation: isHighlighted ? 12 : 5,
+          shadowColor: isHighlighted ? const Color(0x99C5A059) : Colors.black,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: Color(0xFFC5A059), width: 1.5), // Frame Emas tipis
+            side: BorderSide(
+              color: const Color(0xFFC5A059),
+              width: isHighlighted ? 2.5 : 1.5,
+            ), // Frame Emas tipis/tebal
           ),
         ),
         onPressed: onPressed,
@@ -469,7 +323,7 @@ class MainMenuScreen extends StatelessWidget {
             Text(
               label,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w700, // Bold
                 letterSpacing: 1.5,
               ),

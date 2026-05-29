@@ -456,24 +456,17 @@ class BoardState extends ChangeNotifier {
     }
     if (nextEnemyCard == null) return;
 
-    // 1. Tampilkan overlay giliran musuh terlebih dahulu
-    showOverlay(
-      title: "GILIRAN MUSUH",
-      description: "Musuh menyerang!",
-      eventType: "enemy_turn",
-    );
-
-    // 2. Berikan jeda 1,2 detik agar overlay muncul terlebih dahulu baru kemudian kartu musuh muncul & meluncur
-    Future.delayed(const Duration(milliseconds: 1200), () {
+    // Berikan jeda singkat 300ms agar kartu player terpasang rapi, lalu luncurkan kartu musuh
+    Future.delayed(const Duration(milliseconds: 300), () {
       final double cardWidth = screenSize.width * 0.1;
       enemyCardOnTable = nextEnemyCard;
       nextEnemyCard = null;
       battleLog = "Musuh mengeluarkan kartu tandingan! Mengalkulasi hasil...";
       isBattleCalculated = true;
 
-      // Mulai animasi meluncur dari bagian atas layar (di luar batas atas)
-      enemyCardX = screenSize.width * 0.60 - (cardWidth / 2);
-      enemyCardY = -(cardWidth * 1.5);
+      // Mulai animasi meluncur dari ujung kanan layar
+      enemyCardX = screenSize.width + cardWidth;
+      enemyCardY = (screenSize.height / 2) - (cardWidth * 0.7);
       isEnemyAnimating = true;
       notifyListeners();
 
@@ -481,10 +474,7 @@ class BoardState extends ChangeNotifier {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Future.delayed(const Duration(milliseconds: 30), () {
           enemyCardX = screenSize.width * 0.60 - (cardWidth / 2);
-          
-          // Posisi vertikal tengah-tengah body Scaffold
-          final double bodyHeight = screenSize.height;
-          enemyCardY = (bodyHeight / 2) - (cardWidth * 0.7);
+          // enemyCardY tetap sama
           notifyListeners();
         });
       });

@@ -60,9 +60,6 @@ class _ShopScreenState extends State<ShopScreen> {
 
   void _buyCard(PlayerRun playerRun, String cardId, int price, int index) {
     if (playerRun.gold < price) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Emas Anda tidak mencukupi untuk membeli kartu ini!')),
-      );
       return;
     }
 
@@ -71,12 +68,7 @@ class _ShopScreenState extends State<ShopScreen> {
       setState(() {
         _isCardSold[index] = true;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Berhasil membeli kartu! Ditambahkan ke Deck Utama.'),
-          backgroundColor: const Color(0xFFC5A059),
-        ),
-      );
+      // Berhasil membeli kartu
     }
   }
 
@@ -84,9 +76,6 @@ class _ShopScreenState extends State<ShopScreen> {
     if (_hasRestedFree) return;
 
     if (playerRun.currentHp >= playerRun.maxHp) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('HP Anda sudah penuh!')),
-      );
       return;
     }
 
@@ -95,12 +84,7 @@ class _ShopScreenState extends State<ShopScreen> {
       _hasRestedFree = true;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Beristirahat di dekat api unggun. HP bertambah +15!'),
-        backgroundColor: Colors.green,
-      ),
-    );
+    // Berhasil beristirahat
   }
 
   IconData _getConsumableIcon(String iconName) {
@@ -122,19 +106,10 @@ class _ShopScreenState extends State<ShopScreen> {
 
   void _buyConsumable(PlayerRun playerRun, ConsumableCard consumable, int index) {
     if (playerRun.gold < consumable.price) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Emas Anda tidak mencukupi untuk membeli ${consumable.name}!')),
-      );
       return;
     }
 
     if (playerRun.consumableSlots.length >= 2) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Slot Ramuan Anda sudah penuh! Gunakan ramuan yang ada terlebih dahulu.'),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
       return;
     }
 
@@ -607,12 +582,7 @@ class _ShopScreenState extends State<ShopScreen> {
                           // Kembali ke Peta
                           Navigator.pop(context);
                           
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Melanjutkan perjalanan menjelajah dungeon map!'),
-                              backgroundColor: Color(0xFFC5A059),
-                            ),
-                          );
+                          // Kembali ke Peta
                         },
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,

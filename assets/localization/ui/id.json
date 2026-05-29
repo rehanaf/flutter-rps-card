@@ -17,5 +17,15 @@
   "mainMenuButton": "Menu Utama",
   "collectionTitle": "Koleksi Deck",
   "collectionButton": "Koleksi",
-  "howToPlayButton": "Panduan Bermain"
+  "howToPlayButton": "Panduan Bermain",
+  "continueButton": "Lanjutkan",
+  "newRunButton": "Petualangan Baru",
+  "deleteDataButton": "Hapus Data Game",
+  "confirmDeleteTitle": "Hapus Progres Game?",
+  "confirmDeleteMessage": "Apakah Anda yakin ingin menghapus seluruh progres permainan saat ini secara permanen?",
+  "confirmNewRunTitle": "Mulai Petualangan Baru?",
+  "confirmNewRunMessage": "Sesi permainan yang sedang berjalan akan dihapus secara permanen. Apakah Anda yakin?",
+  "yesButton": "Ya, Hapus",
+  "startNewButton": "Ya, Mulai Baru",
+  "saveQuitButton": "Simpan & Keluar"
 }

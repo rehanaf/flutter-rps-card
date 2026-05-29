@@ -23,19 +23,37 @@ void main() async {
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
-  runApp(const MyApp());
+
+  // Muat data game & pengaturan secara asinkron sebelum memicu runApp
+  final playerRun = PlayerRun();
+  await playerRun.loadFromPrefs();
+
+  final settingsProvider = SettingsProvider();
+  await settingsProvider.loadFromPrefs();
+
+  runApp(MyApp(
+    playerRun: playerRun,
+    settingsProvider: settingsProvider,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final PlayerRun playerRun;
+  final SettingsProvider settingsProvider;
+
+  const MyApp({
+    super.key,
+    required this.playerRun,
+    required this.settingsProvider,
+  });
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => PlayerRun()),
+        ChangeNotifierProvider.value(value: playerRun),
         ChangeNotifierProvider(create: (_) => BoardState()),
-        ChangeNotifierProvider(create: (_) => SettingsProvider()),
+        ChangeNotifierProvider.value(value: settingsProvider),
       ],
       child: Consumer<SettingsProvider>(
         builder: (context, settingsProvider, child) {

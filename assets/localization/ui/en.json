@@ -17,5 +17,15 @@
   "mainMenuButton": "Main Menu",
   "collectionTitle": "Deck Collection",
   "collectionButton": "Collection",
-  "howToPlayButton": "How to Play"
+  "howToPlayButton": "How to Play",
+  "continueButton": "Continue Adventure",
+  "newRunButton": "New Adventure",
+  "deleteDataButton": "Delete Game Data",
+  "confirmDeleteTitle": "Delete Game Progress?",
+  "confirmDeleteMessage": "Are you sure you want to permanently delete all your current game progress?",
+  "confirmNewRunTitle": "Start New Adventure?",
+  "confirmNewRunMessage": "Your current ongoing game session will be permanently deleted. Are you sure?",
+  "yesButton": "Yes, Delete",
+  "startNewButton": "Yes, Start New",
+  "saveQuitButton": "Save & Quit"
 }

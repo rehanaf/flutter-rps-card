@@ -6,27 +6,7 @@ import '../../services/app_localizations.dart';
 import '../../components/game_app_bar.dart';
 import '../gameplay/gameplay_screen.dart';
 import '../shop/shop_screen.dart';
-
-/// Struktur data internal khusus untuk mendefinisikan tipe dan konten node di Peta bercabang
-class MapNodeData {
-  final String id;
-  final String type; // 'BATTLE', 'SHOP', 'BOSS'
-  final String enemyId; // ID Musuh dari enemies.json (jika bertipe BATTLE/BOSS)
-  final int floor;
-  final double x;
-  final double y;
-  final List<String> parentIds; // ID parent node yang menuju ke node ini
-
-  MapNodeData({
-    required this.id,
-    required this.type,
-    this.enemyId = '',
-    required this.floor,
-    required this.x,
-    required this.y,
-    required this.parentIds,
-  });
-}
+import '../../models/map_node_data.dart';
 
 class MapScreen extends StatelessWidget {
   static const String routeName = '/map';
@@ -39,120 +19,11 @@ class MapScreen extends StatelessWidget {
     final localization = AppLocalizations.of(context)!;
     final Size screenSize = MediaQuery.of(context).size;
 
-    // DEFINISI STRUKTUR PETA BERCABANG (6 LANTAI - MULTI JALUR MERGE KE BOSS)
-    final List<MapNodeData> mapNodes = [
-      // Floor 1 (Start)
-      MapNodeData(
-        id: 'node_1',
-        type: 'BATTLE',
-        enemyId: 'e_toxic_wizard',
-        floor: 1,
-        x: 60,
-        y: 150,
-        parentIds: [],
-      ),
-      
-      // Floor 2
-      MapNodeData(
-        id: 'node_2_1',
-        type: 'BATTLE',
-        enemyId: 'e_robot_crow',
-        floor: 2,
-        x: 180,
-        y: 90,
-        parentIds: ['node_1'],
-      ),
-      MapNodeData(
-        id: 'node_2_2',
-        type: 'BATTLE',
-        enemyId: 'e_air_assasin',
-        floor: 2,
-        x: 180,
-        y: 210,
-        parentIds: ['node_1'],
-      ),
-      
-      // Floor 3
-      MapNodeData(
-        id: 'node_3_1',
-        type: 'BATTLE',
-        enemyId: 'e_fire_golem',
-        floor: 3,
-        x: 300,
-        y: 50,
-        parentIds: ['node_2_1'],
-      ),
-      MapNodeData(
-        id: 'node_3_2',
-        type: 'SHOP',
-        floor: 3,
-        x: 300,
-        y: 150,
-        parentIds: ['node_2_1', 'node_2_2'],
-      ),
-      MapNodeData(
-        id: 'node_3_3',
-        type: 'BATTLE',
-        enemyId: 'e_ancient_warrior',
-        floor: 3,
-        x: 300,
-        y: 250,
-        parentIds: ['node_2_2'],
-      ),
-      
-      // Floor 4
-      MapNodeData(
-        id: 'node_4_1',
-        type: 'BATTLE',
-        enemyId: 'e_cosmic_assasin',
-        floor: 4,
-        x: 420,
-        y: 90,
-        parentIds: ['node_3_1', 'node_3_2'],
-      ),
-      MapNodeData(
-        id: 'node_4_2',
-        type: 'BATTLE',
-        enemyId: 'e_ancient_warrior',
-        floor: 4,
-        x: 420,
-        y: 210,
-        parentIds: ['node_3_2', 'node_3_3'],
-      ),
-      
-      // Floor 5
-      MapNodeData(
-        id: 'node_5_1',
-        type: 'SHOP',
-        floor: 5,
-        x: 540,
-        y: 90,
-        parentIds: ['node_4_1'],
-      ),
-      MapNodeData(
-        id: 'node_5_2',
-        type: 'SHOP',
-        floor: 5,
-        x: 540,
-        y: 210,
-        parentIds: ['node_4_2'],
-      ),
-      
-      // Floor 6 (Boss - Merged!)
-      MapNodeData(
-        id: 'node_6',
-        type: 'BOSS',
-        enemyId: 'e_boss_skeleton',
-        floor: 6,
-        x: 660,
-        y: 150,
-        parentIds: ['node_5_1', 'node_5_2'],
-      ),
-    ];
+    final mapNodes = playerRun.mapNodes;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: const GameAppBar(showBackButton: false),
+      appBar: const GameAppBar(showBackButton: true),
       body: Stack(
         children: [
           // Wallpaper Background dengan overlay gelap
@@ -310,9 +181,7 @@ class MapScreen extends StatelessWidget {
       final enemyMeta = localization.getEnemyMetadata(node.enemyId);
       
       if (enemyMeta == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: Profil musuh ${node.enemyId} gagal ditemukan!')),
-        );
+        debugPrint('Error: Profil musuh ${node.enemyId} gagal ditemukan!');
         return;
       }
 
@@ -320,6 +189,7 @@ class MapScreen extends StatelessWidget {
 
       // Simpan node terpilih saat ini ke playerRun
       playerRun.selectedNodeId = node.id;
+      playerRun.inBattle = true;
 
       boardState.initializeBattle(
         playerRun: playerRun,
