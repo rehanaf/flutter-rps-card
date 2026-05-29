@@ -78,6 +78,9 @@ class AppLocalizations {
   String getUiText(String key) => _uiTexts[key] ?? key;
   CardMetadata? getCardMetadata(String cardId) => _cardsMetadata[cardId];
   String getCardName(String cardId) => _cardTexts[cardId]?['name'] ?? 'Unknown Card';
+  List<dynamic>? getClashVerbArray(String winnerId, String loserId) {
+    return _cardTexts[winnerId]?['clash_rules']?[loserId] as List<dynamic>?;
+  }
   Map<String, CardMetadata> get allCardsMetadata => _cardsMetadata;
   EnemyMetadata? getEnemyMetadata(String enemyId) => _enemiesMetadata[enemyId];
   Map<String, EnemyMetadata> get allEnemiesMetadata => _enemiesMetadata;

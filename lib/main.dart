@@ -10,6 +10,7 @@ import 'screens/main_menu/main_menu_screen.dart';
 import 'screens/map/map_screen.dart';
 import 'screens/shop/shop_screen.dart';
 import 'screens/how_to_play/how_to_play_screen.dart';
+import 'screens/all_outcomes/all_outcomes_screen.dart';
 import 'services/app_localizations.dart';
 import 'services/settings_provider.dart';
 
@@ -108,6 +109,8 @@ class MyApp extends StatelessWidget {
               return MaterialPageRoute(builder: (_) => const ShopScreen());
             case HowToPlayScreen.routeName:
               return MaterialPageRoute(builder: (_) => const HowToPlayScreen());
+            case AllOutcomesScreen.routeName:
+              return MaterialPageRoute(builder: (_) => const AllOutcomesScreen());
             default:
               return MaterialPageRoute(
                 builder: (_) => Scaffold(

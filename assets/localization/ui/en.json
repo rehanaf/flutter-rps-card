@@ -27,5 +27,6 @@
   "confirmNewRunMessage": "Your current ongoing game session will be permanently deleted. Are you sure?",
   "yesButton": "Yes, Delete",
   "startNewButton": "Yes, Start New",
-  "saveQuitButton": "Save & Quit"
+  "saveQuitButton": "Save & Quit",
+  "allOutcomesButton": "Clash Outcomes"
 }

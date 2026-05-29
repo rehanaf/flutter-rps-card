@@ -48,21 +48,43 @@ class TurnOverlayWidget extends StatelessWidget {
         break;
       case 'clash_win':
         themeColor = const Color(0xFF66BB6A); // Soft Green
-        final playerCardName = data.playerCardId != null ? localization.getCardName(data.playerCardId!) : "Kartu Anda";
-        final enemyCardName = data.enemyCardId != null ? localization.getCardName(data.enemyCardId!) : "Kartu Musuh";
-        finalDescription = "$playerCardName menang melawan $enemyCardName";
+        if (data.playerCardId != null && data.enemyCardId != null) {
+          finalDescription = _buildClashDescription(
+            context,
+            localization,
+            data.playerCardId!,
+            data.enemyCardId!,
+            true,
+          );
+        } else {
+          final playerCardName = data.playerCardId != null ? localization.getCardName(data.playerCardId!) : "Kartu Anda";
+          final enemyCardName = data.enemyCardId != null ? localization.getCardName(data.enemyCardId!) : "Kartu Musuh";
+          finalDescription = "$playerCardName menang melawan $enemyCardName";
+        }
         break;
       case 'clash_lose':
         themeColor = const Color(0xFFEF5350); // Soft Red
-        final playerCardName = data.playerCardId != null ? localization.getCardName(data.playerCardId!) : "Kartu Anda";
-        final enemyCardName = data.enemyCardId != null ? localization.getCardName(data.enemyCardId!) : "Kartu Musuh";
-        finalDescription = "$enemyCardName menang melawan $playerCardName";
+        if (data.playerCardId != null && data.enemyCardId != null) {
+          finalDescription = _buildClashDescription(
+            context,
+            localization,
+            data.enemyCardId!,
+            data.playerCardId!,
+            false,
+          );
+        } else {
+          final playerCardName = data.playerCardId != null ? localization.getCardName(data.playerCardId!) : "Kartu Anda";
+          final enemyCardName = data.enemyCardId != null ? localization.getCardName(data.enemyCardId!) : "Kartu Musuh";
+          finalDescription = "$enemyCardName menang melawan $playerCardName";
+        }
         break;
       case 'clash_draw':
         themeColor = const Color(0xFFFFCA28); // Soft Amber
         final playerCardName = data.playerCardId != null ? localization.getCardName(data.playerCardId!) : "Kartu Anda";
         final enemyCardName = data.enemyCardId != null ? localization.getCardName(data.enemyCardId!) : "Kartu Musuh";
-        finalDescription = "$playerCardName seri melawan $enemyCardName";
+        finalDescription = localization.locale.languageCode == 'id'
+            ? "$playerCardName seri melawan $enemyCardName"
+            : "$playerCardName draws against $enemyCardName";
         break;
       default:
         themeColor = const Color(0xFFC5A059);
@@ -130,4 +152,52 @@ class TurnOverlayWidget extends StatelessWidget {
       ),
     );
   }
+
+String _buildClashDescription(
+  BuildContext context,
+  AppLocalizations localization,
+  String winnerId,
+  String loserId,
+  bool isPlayerWinner,
+) {
+  final String winnerName = localization.getCardName(winnerId);
+  final String loserName = localization.getCardName(loserId);
+
+  final List<dynamic>? rawVerbArray = localization.getClashVerbArray(winnerId, loserId);
+
+  if (rawVerbArray != null && rawVerbArray.isNotEmpty) {
+    final List<String> verbArray = rawVerbArray.map((e) {
+      String s = e.toString();
+      s = s.replaceAll(r"\'", "'").replaceAll(r"\\'", "'").replaceAll(r"\", "");
+      return s;
+    }).toList();
+
+    final String part1 = verbArray[0];
+    if (verbArray.length == 1) {
+      return "$winnerName $part1 $loserName";
+    } else if (verbArray.length >= 2) {
+      final String part2 = verbArray[1];
+      if (part1.isEmpty) {
+        return "$winnerName $loserName$part2";
+      }
+
+      final String middle = part1.endsWith('(') ? "$part1$loserName" : "$part1 $loserName";
+
+      if (part2.isEmpty) {
+        return "$winnerName $middle";
+      } else if (part2.startsWith("'s") || part2 == ")") {
+        return "$winnerName $middle$part2";
+      } else {
+        return "$winnerName $middle $part2";
+      }
+    }
+  }
+
+  // Fallback default
+  if (localization.locale.languageCode == 'id') {
+    return "$winnerName menang melawan $loserName";
+  } else {
+    return "$winnerName wins against $loserName";
+  }
+}
 }

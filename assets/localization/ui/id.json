@@ -27,5 +27,6 @@
   "confirmNewRunMessage": "Sesi permainan yang sedang berjalan akan dihapus secara permanen. Apakah Anda yakin?",
   "yesButton": "Ya, Hapus",
   "startNewButton": "Ya, Mulai Baru",
-  "saveQuitButton": "Simpan & Keluar"
+  "saveQuitButton": "Simpan & Keluar",
+  "allOutcomesButton": "Hasil Bentrokan"
 }

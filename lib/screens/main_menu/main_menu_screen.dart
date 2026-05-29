@@ -7,6 +7,7 @@ import '../../components/settings_dialog.dart';
 import '../collection/collection_screen.dart';
 import '../how_to_play/how_to_play_screen.dart';
 import '../map/map_screen.dart';
+import '../all_outcomes/all_outcomes_screen.dart';
 import '../../board/board_state.dart';
 import '../gameplay/gameplay_screen.dart';
 
@@ -181,6 +182,17 @@ class MainMenuScreen extends StatelessWidget {
                               icon: Icons.menu_book_rounded,
                               onPressed: () {
                                 Navigator.pushNamed(context, HowToPlayScreen.routeName);
+                              },
+                            ),
+                            
+                            const SizedBox(height: 12),
+                             
+                            _buildMenuButton(
+                              context,
+                              label: localization.getUiText('allOutcomesButton'),
+                              icon: Icons.compare_arrows_rounded,
+                              onPressed: () {
+                                Navigator.pushNamed(context, AllOutcomesScreen.routeName);
                               },
                             ),
                             
